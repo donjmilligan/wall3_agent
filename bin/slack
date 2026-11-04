@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Thin wrapper: run the `slack` console script from clients/slack/ via uv.
+# Works from any cwd and through symlinks; relative paths in arguments
+# (e.g. --text-file) still resolve against the caller's cwd.
+set -euo pipefail
+src="${BASH_SOURCE[0]}"
+while [ -L "$src" ]; do
+  dir="$(cd -P "$(dirname "$src")" && pwd)"
+  src="$(readlink "$src")"
+  [[ "$src" != /* ]] && src="$dir/$src"
+done
+ROOT="$(cd -P "$(dirname "$src")/.." && pwd)"
+exec uv run --quiet --project "$ROOT/clients/slack" slack "$@"

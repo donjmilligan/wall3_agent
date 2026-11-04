@@ -24,7 +24,8 @@ addopts = "--import-mode=importlib"
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-# Each package below runs its own gate from its own directory (see ci.yml).
+# Each package runs its own gate from its own directory (see ci.yml); verified that
+# running ruff inside a package dir still lints it despite this exclusion.
 extend-exclude = ["clients", "tools/messaging"]
 
 [tool.ruff.lint]
