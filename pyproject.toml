@@ -1,0 +1,36 @@
+[project]
+name = "wall3-agent-harness"
+version = "0.1.0"
+description = "Dev tooling and tests for the wall3_agent harness (hooks, scripts)."
+requires-python = ">=3.12,<3.13"
+# Runtime dependency of scripts/check_message_contract.py.
+dependencies = ["jsonschema>=4.23"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "ruff>=0.8",
+    "pyright>=1.1.390",
+]
+
+[tool.uv]
+# Not an installable package: the root project only provides a dev environment.
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--import-mode=importlib"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+# Each package below runs its own gate from its own directory (see ci.yml).
+extend-exclude = ["clients", "tools/messaging"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pyright]
+include = [".claude/hooks", "scripts", "tests"]
+pythonVersion = "3.12"
+typeCheckingMode = "standard"
