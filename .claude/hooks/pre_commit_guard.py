@@ -9,7 +9,8 @@ reason Claude sees) if it includes:
 * a ``.env`` / ``.env.*`` file other than ``.env.example``;
 * anything under a ``.cache/`` or ``exports/`` directory;
 * content matching a token pattern (Slack ``xox?-`` / ``xapp-``, ClickUp
-  ``pk_<n>_``, Anthropic ``sk-ant-``, GitHub ``ghp_`` / ``github_pat_``).
+  ``pk_<n>_``, Anthropic ``sk-ant-``, GitHub ``ghp_`` / ``github_pat_``,
+  AWS ``AKIA...``).
 
 "What the commit would contain" is the index, plus tracked modifications when
 the commit uses ``-a``, plus whatever a ``git add`` earlier in the same
@@ -39,6 +40,7 @@ TOKEN_PATTERNS: list[tuple[str, re.Pattern[bytes]]] = [
     ("Anthropic key", re.compile(rb"sk-ant-[0-9A-Za-z_-]{16,}")),
     ("GitHub token", re.compile(rb"ghp_[0-9A-Za-z]{30,}")),
     ("GitHub token", re.compile(rb"github_pat_[0-9A-Za-z_]{30,}")),
+    ("AWS access key id", re.compile(rb"AKIA[0-9A-Z]{16}")),
 ]
 
 #: `git commit` options that consume the following token.
