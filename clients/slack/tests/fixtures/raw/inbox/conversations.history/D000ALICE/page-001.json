@@ -1,0 +1,28 @@
+{
+  "ok": true,
+  "messages": [
+    {
+      "type": "message",
+      "user": "U000ALICE",
+      "text": "Can you review <https://example.com/plan|the deploy plan> before noon? cc <@U000BOB>",
+      "ts": "1793786400.000100"
+    },
+    {
+      "type": "message",
+      "user": "U000DON",
+      "text": "Sure, what's up?",
+      "ts": "1793783100.000100"
+    },
+    {
+      "type": "message",
+      "user": "U000ALICE",
+      "text": "Morning! Quick question about the release.",
+      "ts": "1793782800.000100"
+    }
+  ],
+  "has_more": false,
+  "pin_count": 0,
+  "response_metadata": {
+    "next_cursor": ""
+  }
+}

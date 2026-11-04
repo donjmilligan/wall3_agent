@@ -1,0 +1,33 @@
+# Slack app manifest for the wall3 agent harness.
+#
+# Single-workspace, internal, never distributed. USER token scopes only: the
+# app acts as the person who installs it (reads their DMs and mentions, uses
+# search, and -- only when they pass --confirm -- posts as them). No bot user,
+# no events, no redirect URLs.
+#
+# Create the app from this file at https://api.slack.com/apps -> Create New App
+# -> From a manifest. See README.md for the full walk-through.
+_metadata:
+  major_version: 2
+  minor_version: 1
+display_information:
+  name: wall3 agent
+  description: Personal triage and reply drafting. Drafts only; every send is approved by the owner.
+oauth_config:
+  scopes:
+    user:
+      - channels:history
+      - groups:history
+      - im:history
+      - mpim:history
+      - channels:read
+      - groups:read
+      - im:read
+      - mpim:read
+      - users:read
+      - search:read
+      - chat:write
+settings:
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false

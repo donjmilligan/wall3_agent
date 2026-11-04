@@ -1,0 +1,13 @@
+{
+  "verb": "inbox",
+  "fetched_at": "2026-11-04T18:00:00Z",
+  "since": "24h",
+  "oldest": "1793728800.000000",
+  "params": {},
+  "discovery_only": [
+    "search.messages/my-messages"
+  ],
+  "truncated": [],
+  "skipped": [],
+  "calls": {}
+}
