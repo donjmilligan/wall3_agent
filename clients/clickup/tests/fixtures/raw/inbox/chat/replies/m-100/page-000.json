@@ -1,0 +1,21 @@
+{
+  "next_cursor": "",
+  "data": [
+    {
+      "id": "m-102",
+      "type": "message",
+      "user_id": "1001",
+      "content": "Will do this afternoon.",
+      "date": 1793797800000,
+      "parent_channel": "ch-general",
+      "resolved": false,
+      "replies_count": 0,
+      "links": {
+        "reactions": "/api/v3/workspaces/9000001/chat/messages/m-102/reactions",
+        "replies": "/api/v3/workspaces/9000001/chat/messages/m-102/replies",
+        "tagged_users": "/api/v3/workspaces/9000001/chat/messages/m-102/tagged_users"
+      },
+      "parent_message": "m-100"
+    }
+  ]
+}

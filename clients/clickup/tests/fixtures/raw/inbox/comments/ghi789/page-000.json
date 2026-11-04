@@ -1,0 +1,35 @@
+{
+  "comments": [
+    {
+      "id": "5201",
+      "comment": [
+        {
+          "type": "tag",
+          "user": {
+            "id": 1001,
+            "username": "Don Example"
+          },
+          "text": "@Don Example"
+        },
+        {
+          "text": " the onboarding checklist needs your sign-off."
+        }
+      ],
+      "comment_text": "@Don Example the onboarding checklist needs your sign-off.",
+      "user": {
+        "id": 1002,
+        "username": "Alice Example",
+        "email": "alice@example.com",
+        "color": "#ff7800",
+        "initials": "AE",
+        "profilePicture": null
+      },
+      "resolved": false,
+      "assignee": null,
+      "assigned_by": null,
+      "reactions": [],
+      "date": "1793794500000",
+      "reply_count": "1"
+    }
+  ]
+}

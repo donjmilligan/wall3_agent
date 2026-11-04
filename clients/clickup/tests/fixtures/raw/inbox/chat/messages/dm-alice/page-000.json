@@ -1,0 +1,35 @@
+{
+  "next_cursor": "",
+  "data": [
+    {
+      "id": "m-200",
+      "type": "message",
+      "user_id": "1002",
+      "content": "Quick question about the invoice total.",
+      "date": 1793800800000,
+      "parent_channel": "dm-alice",
+      "resolved": false,
+      "replies_count": 0,
+      "links": {
+        "reactions": "/api/v3/workspaces/9000001/chat/messages/m-200/reactions",
+        "replies": "/api/v3/workspaces/9000001/chat/messages/m-200/replies",
+        "tagged_users": "/api/v3/workspaces/9000001/chat/messages/m-200/tagged_users"
+      }
+    },
+    {
+      "id": "m-199",
+      "type": "message",
+      "user_id": "1001",
+      "content": "Hi Alice, did the invoice go out?",
+      "date": 1793800200000,
+      "parent_channel": "dm-alice",
+      "resolved": false,
+      "replies_count": 0,
+      "links": {
+        "reactions": "/api/v3/workspaces/9000001/chat/messages/m-199/reactions",
+        "replies": "/api/v3/workspaces/9000001/chat/messages/m-199/replies",
+        "tagged_users": "/api/v3/workspaces/9000001/chat/messages/m-199/tagged_users"
+      }
+    }
+  ]
+}
