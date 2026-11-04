@@ -36,6 +36,7 @@ from .extract import (
     lookup_user,
     new_run_dir,
 )
+from .extract.store import UnsafeComponentError
 from .models import Message, Whoami
 from .normalize import NormalizeError, normalize_dir
 from .normalize.fields import user_display_name
@@ -357,7 +358,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         args.since = delta
     try:
         return int(args.func(args))
-    except (ConfigError, NormalizeError, NotFoundError) as exc:
+    except (ConfigError, NormalizeError, NotFoundError, UnsafeComponentError) as exc:
         print(f"slack: {exc}", file=sys.stderr)
         return EXIT_ERROR
     except SlackAPIError as exc:
