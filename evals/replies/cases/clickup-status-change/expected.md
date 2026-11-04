@@ -22,6 +22,8 @@ Says the status was already changed and the task closed. At draft time nothing h
 
 ## Proposed writes
 
-Proposed, for Don to approve (comment first, then status, one command):
-`bin/clickup status fake-task-202 complete --comment-file <scratch>/reply.txt --confirm`
+Proposed, for Don to approve (comment first, then status, one command). Dry run first,
+which prints `sha256: <hex>`:
+`bin/clickup status fake-task-202 complete --comment-file <scratch>/reply.txt`
+then, after Don approves that preview, the same command with `--confirm --expect-sha256 <hex>`.
 Read the list's actual status names from `bin/clickup task fake-task-202 --json` first; do not assume "complete" exists.

@@ -37,9 +37,13 @@ message, status change, task create/update/move/delete, tag, time entry.
 - **One approval, one message.** "Send them all" is approval for the listed
   drafts Don can see, nothing more. Approval earlier in the session does not
   carry to a new message.
-- Write the text to a file and pass `--text-file` / `--comment-file`, so the
-  approval prompt shows exactly what will be posted. Add `--confirm` only after
-  Don approves; without it the CLI refuses (exit 3).
+- Write the text to a file (with the Write tool) and pass `--text-file` /
+  `--comment-file`, so the approval prompt shows exactly what will be posted. Run
+  the command without `--confirm` first: the CLI refuses (exit 3) and prints the
+  preview and `sha256: <hex>`. Show Don that preview. Only after he approves, re-run
+  the same command with `--confirm --expect-sha256 <hex>`; the CLI sends only bytes
+  that hash to `<hex>` (else exit 4), so what goes out is what he saw. Never edit
+  the file after the dry run; a change means a new dry run and a new approval.
 - `.claude/hooks/outbound_guard.py` and `permissions.ask` in
   `.claude/settings.json` force a prompt on every write. Never work around
   them: no alternate binaries, no `curl` to the API, no MCP tool the hook
