@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "id": "7778",
+      "comment": [
+        {
+          "text": "Following up on this."
+        }
+      ],
+      "comment_text": "Following up on this.",
+      "user": {
+        "id": 1002,
+        "username": "Alice Example",
+        "email": "alice@example.com",
+        "color": "#ff7800",
+        "initials": "AE",
+        "profilePicture": null
+      },
+      "resolved": false,
+      "assignee": null,
+      "assigned_by": null,
+      "reactions": [],
+      "date": "1793784600000",
+      "reply_count": "0"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "teams": [
+    {
+      "id": "9000001",
+      "name": "Example Workspace",
+      "color": "#000000",
+      "avatar": null,
+      "members": [
+        {
+          "user": {
+            "id": 1001,
+            "username": "Don Example",
+            "color": "#7b68ee",
+            "initials": "DE",
+            "profilePicture": null
+          }
+        },
+        {
+          "user": {
+            "id": 1002,
+            "username": "Alice Example",
+            "color": "#ff7800",
+            "initials": "AE",
+            "profilePicture": null
+          }
+        },
+        {
+          "user": {
+            "id": 1003,
+            "username": "Bob Example",
+            "color": "#1b998b",
+            "initials": "BE",
+            "profilePicture": null
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "id": "5301",
+      "comment": [
+        {
+          "text": "Invoice uploaded."
+        }
+      ],
+      "comment_text": "Invoice uploaded.",
+      "user": {
+        "id": 1003,
+        "username": "Bob Example",
+        "email": "bob@example.com",
+        "color": "#1b998b",
+        "initials": "BE",
+        "profilePicture": null
+      },
+      "resolved": false,
+      "assignee": null,
+      "assigned_by": null,
+      "reactions": [],
+      "date": "1793777400000",
+      "reply_count": "0"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "next_cursor": "",
+  "data": [
+    {
+      "id": "1001",
+      "name": "Don Example",
+      "username": "Don Example",
+      "email": "don@example.com",
+      "initials": "DE"
+    }
+  ]
+}
