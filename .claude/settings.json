@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "ask": [
+      "mcp__claude_ai_Slack__slack_send_message",
+      "mcp__claude_ai_Slack__slack_schedule_message",
+      "mcp__claude_ai_Slack__slack_add_reaction",
+      "mcp__claude_ai_Slack__slack_create_canvas",
+      "mcp__claude_ai_Slack__slack_update_canvas",
+      "mcp__claude_ai_Slack__slack_create_conversation",
+      "mcp__claude_ai_Slack__slack_add_list_record",
+      "mcp__claude_ai_Slack__slack_update_list",
+      "mcp__claude_ai_Slack__slack_update_list_record",
+      "mcp__claude_ai_Slack__slack_create_list",
+      "mcp__claude_ai_Slack__slack_send_message_draft",
+      "mcp__claude_ai_Slack__slack_complete_file_upload",
+      "mcp__claude_ai_ClickUp__clickup_create_task_comment",
+      "mcp__claude_ai_ClickUp__clickup_create_comment",
+      "mcp__claude_ai_ClickUp__clickup_send_chat_message",
+      "mcp__claude_ai_ClickUp__clickup_update_chat_message",
+      "mcp__claude_ai_ClickUp__clickup_delete_chat_message",
+      "mcp__claude_ai_ClickUp__clickup_react_to_chat_message",
+      "mcp__claude_ai_ClickUp__clickup_update_task",
+      "mcp__claude_ai_ClickUp__clickup_create_task",
+      "mcp__claude_ai_ClickUp__clickup_delete_task",
+      "mcp__claude_ai_ClickUp__clickup_delete_comment",
+      "mcp__claude_ai_ClickUp__clickup_update_comment",
+      "mcp__claude_ai_ClickUp__clickup_move_task",
+      "mcp__claude_ai_ClickUp__clickup_merge_tasks",
+      "mcp__claude_ai_ClickUp__clickup_execute_operator",
+      "Bash(bin/slack send *)",
+      "Bash(bin/clickup comment *)",
+      "Bash(bin/clickup status *)",
+      "Bash(./bin/slack send *)",
+      "Bash(./bin/clickup comment *)",
+      "Bash(./bin/clickup status *)",
+      "Bash(slack send *)",
+      "Bash(clickup comment *)",
+      "Bash(clickup status *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(rm -fr *)",
+      "Bash(git push --force*)",
+      "Bash(git push -f *)",
+      "Bash(git push * --force*)",
+      "Bash(git push * -f *)",
+      "Bash(git reset --hard *)",
+      "Bash(git commit * --no-verify*)",
+      "Bash(git push * --no-verify*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/hooks/session_start.py\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/hooks/outbound_guard.py\"",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/hooks/pre_commit_guard.py\"",
+            "timeout": 60
+          }
+        ]
+      },
+      {
+        "matcher": "^mcp__.*([Ss]lack|[Cc]lick[Uu]p).*__",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/hooks/outbound_guard.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/hooks/untrusted_content.py\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "^mcp__.*([Ss]lack|[Cc]lick[Uu]p).*__",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/hooks/untrusted_content.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/hooks/notify.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
