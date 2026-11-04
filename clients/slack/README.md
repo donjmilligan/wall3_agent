@@ -1,7 +1,8 @@
 # wall3_slack
 
 A Slack Web API client and CLI that reads your DMs, @-mentions and threads, and
-posts replies **only when you pass `--confirm`**. It uses a *user* token
+posts replies **only when you pass `--confirm` together with the `--expect-sha256`
+digest of the exact text Don approved**. It uses a *user* token
 (`xoxp-...`), so it acts as you: it can read what you can read, and anything it
 sends is sent as you.
 
@@ -58,7 +59,8 @@ about truncation and skipped items go to **stderr**, so stdout stays clean JSONL
 | 0 | ok |
 | 1 | config or API error (missing token, missing scope, not found, ...) |
 | 2 | usage error (argparse) |
-| 3 | `send` refused because `--confirm` was not given |
+| 3 | `send` refused because `--confirm` was not given (dry run: preview + `sha256:`) |
+| 4 | `send --confirm` refused: `--expect-sha256` missing, malformed or not the text file's hash |
 
 ### `whoami`
 
@@ -124,18 +126,28 @@ bin/slack normalize .cache/raw/slack/20261104T180000Z --json
 bin/slack normalize clients/slack/tests/fixtures/raw/inbox --json
 ```
 
-### `send --channel C --thread-ts T --text-file F [--confirm]`
+### `send --channel C --thread-ts T --text-file F [--confirm --expect-sha256 H]`
 
 ```
 bin/slack send --channel D000ALICE --thread-ts 1793786400.000100 --text-file draft.txt
-#   -> prints a DRY RUN preview (channel, thread, full text), exits 3, sends nothing
+#   -> prints a DRY RUN preview (channel, thread, full text) and `sha256: <H>`,
+#      exits 3, sends nothing
 
-bin/slack send --channel D000ALICE --thread-ts 1793786400.000100 --text-file draft.txt --confirm
+bin/slack send --channel D000ALICE --thread-ts 1793786400.000100 --text-file draft.txt \
+  --confirm --expect-sha256 <H>
 #   -> posts AS YOU via chat.postMessage and prints the new message's permalink
 ```
 
 * Text comes only from `--text-file`. There is no inline `--text`.
 * Without `--confirm`, no client is built and no network call happens.
+* **Approved-text hash.** `--confirm` needs `--expect-sha256` set to the digest
+  the dry run printed. The file is read once (it must be a regular file, or a
+  symlink to one; a FIFO, device or directory is refused, and a FIFO cannot
+  hang the read), the bytes read are hashed and compared before any network
+  call, and exactly those bytes are posted. A missing or different hash exits
+  4 and sends nothing, so text that changed after Don saw it is never posted.
+* Every option may be given once. A repeat (`--channel A --channel B`) is a
+  usage error (exit 2): argparse would otherwise keep the last one.
 * Flags cannot be abbreviated, so `--conf` does not count as `--confirm`.
 * `--thread-ts` is optional. Leave it out to post at the top level of the
   conversation.
@@ -166,8 +178,9 @@ anything cut off by a cap is listed as `truncated` on stderr and in
   printed, written to the raw cache, or included in errors or `repr`.
 * Auth and scope errors (`invalid_auth`, `token_revoked`, `missing_scope`, ...)
   are never retried. `missing_scope` names the scope to add.
-* `send` is the only write. It needs `--confirm`, and the harness's outbound
-  guard hook asks Don before any `bin/slack send` runs.
+* `send` is the only write. It needs `--confirm --expect-sha256 <H>`, and the
+  harness's outbound guard hook asks Don before any `bin/slack send` runs,
+  showing the text and whether its hash matches `H`.
 
 ## Development
 

@@ -72,6 +72,16 @@ cost one request per line of output. Search matches come with Slack's own
 `permalink`, and normalize keeps it. `send --confirm` does call
 `chat.getPermalink` once, for the message it just posted.
 
+### Sends are bound to the approved bytes
+
+`send` reads `--text-file` once through `approval.read_text_bytes` (`O_NONBLOCK`
+open, `fstat` must say regular file, size cap), hashes those bytes, and posts
+the same bytes. `--confirm` without an `--expect-sha256` equal to that hash
+exits 4 before a client is built. The outbound guard hook computes the same
+hash from the same file at approval time, so what Don approved in the prompt is
+what is posted, even if the file is swapped in between. All options use
+`approval.StoreOnce` / `approval.FlagOnce`, which reject a repeated option.
+
 ### `awaiting_reply`, read literally
 
 From the contract: true when "last message in its thread is not from me AND

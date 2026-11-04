@@ -127,12 +127,13 @@ as JSONL with `--json`. Tokens come from `.env` (see `.env.example`).
 
 ```bash
 bin/slack whoami --json
-bin/slack inbox --since 24h --json            # DMs + mentions, newest first
+bin/slack inbox --since 24h --json            # DMs, group DMs, mentions, my threads with new replies
 bin/slack thread <permalink|C:ts>
 bin/slack channel <name|id> --since 2d --limit 50
 bin/slack search "<query>"
 bin/slack user <id|@name>
-bin/slack send --channel C --thread-ts T --text-file F --confirm   # Don approves first
+bin/slack send --channel C --thread-ts T --text-file F            # dry run: preview + sha256
+bin/slack send --channel C --thread-ts T --text-file F --confirm --expect-sha256 H  # after Don approves
 
 bin/clickup whoami --json
 bin/clickup inbox --since 24h --json
@@ -140,15 +141,20 @@ bin/clickup task <id> --comments --json
 bin/clickup search "<query>"
 bin/clickup mine --status "in progress"
 bin/clickup chat channels | bin/clickup chat messages <id>
-bin/clickup comment <id> --text-file F --confirm                  # Don approves first
-bin/clickup status <id> <status> --comment-file F --confirm       # comment, then status
+bin/clickup comment <id> --text-file F                            # dry run: preview + sha256
+bin/clickup comment <id> --text-file F --confirm --expect-sha256 H              # after approval
+bin/clickup status <id> <status> --comment-file F --confirm --expect-sha256 H   # comment, then status
 
 bin/inbox-rank   # deterministic ranking of inbox JSONL
 bin/check-draft  # deterministic checks on a draft reply
 ```
 
-Exit codes: 0 ok, 1 config/API error, 3 write refused (no `--confirm`). Every
-write verb asks Don via the hook, with the target and text on screen.
+Exit codes: 0 ok, 1 config/API error, 2 usage error (incl. a repeated or
+abbreviated option), 3 write refused (no `--confirm`; dry run prints the preview
+and `sha256: H`), 4 approved-text hash missing or mismatched (`--confirm`
+without `--expect-sha256 H`, or the file no longer hashes to `H`; nothing sent).
+Every write verb asks Don via the hook, with the target, the text and whether
+its hash matches on screen.
 
 ## Gates
 

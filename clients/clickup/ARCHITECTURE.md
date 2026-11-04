@@ -52,8 +52,12 @@ cli.py              human output or JSONL (--json)
 - **SilentStatusChange:** `update_task_status` refuses (before any request)
   unless this client instance has commented on that task.
   `allow_silent_status=True` is the explicit escape. The CLI never uses it.
-- **Write verbs:** preview without `--confirm` (exit 3, zero network calls);
-  text only from files.
+- **Write verbs:** preview without `--confirm` (exit 3, zero network calls,
+  prints the text file's sha256); text only from files; `--confirm` needs
+  `--expect-sha256` equal to that hash (else exit 4, zero network calls). The
+  file is read once (`approval.read_text_bytes`: `O_NONBLOCK`, `fstat` regular
+  file) and the comment is built from the hashed bytes. Every option rejects a
+  repeat (`approval.StoreOnce` / `FlagOnce`) and no parser allows abbreviations.
 - **Message semantics** (also in `normalize/messages.py`):
   - *thread*: task comments share `thread_id` = task id, including threaded
     replies, as the contract specifies. In chat, a reply and its root share
