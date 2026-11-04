@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "id": "5002",
+      "comment": [
+        {
+          "text": "Approved, ship it."
+        }
+      ],
+      "comment_text": "Approved, ship it.",
+      "user": {
+        "id": 1001,
+        "username": "Don Example",
+        "email": "don@example.com",
+        "color": "#7b68ee",
+        "initials": "DE",
+        "profilePicture": null
+      },
+      "resolved": false,
+      "assignee": null,
+      "assigned_by": null,
+      "reactions": [],
+      "date": "1793786400000",
+      "reply_count": "0"
+    },
+    {
+      "id": "5001",
+      "comment": [
+        {
+          "text": "@Don Example can you approve the report numbers?"
+        }
+      ],
+      "comment_text": "@Don Example can you approve the report numbers?",
+      "user": {
+        "id": 1002,
+        "username": "Alice Example",
+        "email": "alice@example.com",
+        "color": "#ff7800",
+        "initials": "AE",
+        "profilePicture": null
+      },
+      "resolved": false,
+      "assignee": null,
+      "assigned_by": null,
+      "reactions": [],
+      "date": "1793782800000",
+      "reply_count": "0"
+    }
+  ]
+}

@@ -1,0 +1,272 @@
+{
+  "tasks": [
+    {
+      "id": "ghi789",
+      "custom_id": null,
+      "name": "Update onboarding docs",
+      "text_content": "",
+      "description": "",
+      "status": {
+        "status": "in progress",
+        "type": "custom",
+        "orderindex": 1,
+        "color": "#000000"
+      },
+      "date_created": "1792486800000",
+      "date_updated": "1793794800000",
+      "date_closed": null,
+      "date_done": null,
+      "creator": {
+        "id": 1003,
+        "username": "Bob Example",
+        "email": "bob@example.com",
+        "color": "#1b998b",
+        "initials": "BE",
+        "profilePicture": null
+      },
+      "assignees": [
+        {
+          "id": 1003,
+          "username": "Bob Example",
+          "email": "bob@example.com",
+          "color": "#1b998b",
+          "initials": "BE",
+          "profilePicture": null
+        }
+      ],
+      "watchers": [
+        {
+          "id": 1003,
+          "username": "Bob Example",
+          "email": "bob@example.com",
+          "color": "#1b998b",
+          "initials": "BE",
+          "profilePicture": null
+        }
+      ],
+      "tags": [],
+      "parent": null,
+      "priority": null,
+      "due_date": null,
+      "team_id": "9000001",
+      "url": "https://app.clickup.com/t/ghi789",
+      "list": {
+        "id": "800001",
+        "name": "Example List",
+        "access": true
+      },
+      "folder": {
+        "id": "700001",
+        "name": "Example Folder",
+        "hidden": false,
+        "access": true
+      },
+      "space": {
+        "id": "600001"
+      }
+    },
+    {
+      "id": "def456",
+      "custom_id": null,
+      "name": "Quarterly report draft",
+      "text_content": "",
+      "description": "",
+      "status": {
+        "status": "in progress",
+        "type": "custom",
+        "orderindex": 1,
+        "color": "#000000"
+      },
+      "date_created": "1792486800000",
+      "date_updated": "1793786400000",
+      "date_closed": null,
+      "date_done": null,
+      "creator": {
+        "id": 1002,
+        "username": "Alice Example",
+        "email": "alice@example.com",
+        "color": "#ff7800",
+        "initials": "AE",
+        "profilePicture": null
+      },
+      "assignees": [
+        {
+          "id": 1002,
+          "username": "Alice Example",
+          "email": "alice@example.com",
+          "color": "#ff7800",
+          "initials": "AE",
+          "profilePicture": null
+        }
+      ],
+      "watchers": [
+        {
+          "id": 1002,
+          "username": "Alice Example",
+          "email": "alice@example.com",
+          "color": "#ff7800",
+          "initials": "AE",
+          "profilePicture": null
+        }
+      ],
+      "tags": [],
+      "parent": null,
+      "priority": null,
+      "due_date": null,
+      "team_id": "9000001",
+      "url": "https://app.clickup.com/t/def456",
+      "list": {
+        "id": "800001",
+        "name": "Example List",
+        "access": true
+      },
+      "folder": {
+        "id": "700001",
+        "name": "Example Folder",
+        "hidden": false,
+        "access": true
+      },
+      "space": {
+        "id": "600001"
+      }
+    },
+    {
+      "id": "abc123",
+      "custom_id": null,
+      "name": "Fix login redirect",
+      "text_content": "",
+      "description": "",
+      "status": {
+        "status": "in progress",
+        "type": "custom",
+        "orderindex": 1,
+        "color": "#000000"
+      },
+      "date_created": "1792486800000",
+      "date_updated": "1793779200000",
+      "date_closed": null,
+      "date_done": null,
+      "creator": {
+        "id": 1002,
+        "username": "Alice Example",
+        "email": "alice@example.com",
+        "color": "#ff7800",
+        "initials": "AE",
+        "profilePicture": null
+      },
+      "assignees": [
+        {
+          "id": 1001,
+          "username": "Don Example",
+          "email": "don@example.com",
+          "color": "#7b68ee",
+          "initials": "DE",
+          "profilePicture": null
+        }
+      ],
+      "watchers": [
+        {
+          "id": 1001,
+          "username": "Don Example",
+          "email": "don@example.com",
+          "color": "#7b68ee",
+          "initials": "DE",
+          "profilePicture": null
+        },
+        {
+          "id": 1002,
+          "username": "Alice Example",
+          "email": "alice@example.com",
+          "color": "#ff7800",
+          "initials": "AE",
+          "profilePicture": null
+        }
+      ],
+      "tags": [],
+      "parent": null,
+      "priority": null,
+      "due_date": null,
+      "team_id": "9000001",
+      "url": "https://app.clickup.com/t/abc123",
+      "list": {
+        "id": "800001",
+        "name": "Example List",
+        "access": true
+      },
+      "folder": {
+        "id": "700001",
+        "name": "Example Folder",
+        "hidden": false,
+        "access": true
+      },
+      "space": {
+        "id": "600001"
+      }
+    },
+    {
+      "id": "jkl012",
+      "custom_id": null,
+      "name": "Vendor invoice review",
+      "text_content": "",
+      "description": "",
+      "status": {
+        "status": "in progress",
+        "type": "custom",
+        "orderindex": 1,
+        "color": "#000000"
+      },
+      "date_created": "1792486800000",
+      "date_updated": "1793777400000",
+      "date_closed": null,
+      "date_done": null,
+      "creator": {
+        "id": 1003,
+        "username": "Bob Example",
+        "email": "bob@example.com",
+        "color": "#1b998b",
+        "initials": "BE",
+        "profilePicture": null
+      },
+      "assignees": [
+        {
+          "id": 1003,
+          "username": "Bob Example",
+          "email": "bob@example.com",
+          "color": "#1b998b",
+          "initials": "BE",
+          "profilePicture": null
+        }
+      ],
+      "watchers": [
+        {
+          "id": 1003,
+          "username": "Bob Example",
+          "email": "bob@example.com",
+          "color": "#1b998b",
+          "initials": "BE",
+          "profilePicture": null
+        }
+      ],
+      "tags": [],
+      "parent": null,
+      "priority": null,
+      "due_date": null,
+      "team_id": "9000001",
+      "url": "https://app.clickup.com/t/jkl012",
+      "list": {
+        "id": "800001",
+        "name": "Example List",
+        "access": true
+      },
+      "folder": {
+        "id": "700001",
+        "name": "Example Folder",
+        "hidden": false,
+        "access": true
+      },
+      "space": {
+        "id": "600001"
+      }
+    }
+  ]
+}

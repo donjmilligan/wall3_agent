@@ -1,0 +1,35 @@
+{
+  "next_cursor": "",
+  "data": [
+    {
+      "id": "m-101",
+      "type": "message",
+      "user_id": "1003",
+      "content": "Lunch anyone?",
+      "date": 1793797500000,
+      "parent_channel": "ch-general",
+      "resolved": false,
+      "replies_count": 0,
+      "links": {
+        "reactions": "/api/v3/workspaces/9000001/chat/messages/m-101/reactions",
+        "replies": "/api/v3/workspaces/9000001/chat/messages/m-101/replies",
+        "tagged_users": "/api/v3/workspaces/9000001/chat/messages/m-101/tagged_users"
+      }
+    },
+    {
+      "id": "m-100",
+      "type": "message",
+      "user_id": "1002",
+      "content": "@Don can you review the release notes?",
+      "date": 1793797200000,
+      "parent_channel": "ch-general",
+      "resolved": false,
+      "replies_count": 1,
+      "links": {
+        "reactions": "/api/v3/workspaces/9000001/chat/messages/m-100/reactions",
+        "replies": "/api/v3/workspaces/9000001/chat/messages/m-100/replies",
+        "tagged_users": "/api/v3/workspaces/9000001/chat/messages/m-100/tagged_users"
+      }
+    }
+  ]
+}
