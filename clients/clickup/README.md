@@ -2,7 +2,8 @@
 
 ClickUp REST client and `clickup` CLI for the wall3 agent harness. Claude uses it
 to read ClickUp (task comments, assigned tasks, Chat) and to *draft* replies.
-Nothing is posted unless Don approves it and the command carries `--confirm`.
+Nothing is posted unless Don approves it and the command carries `--confirm` plus
+the `--expect-sha256` digest of the exact text he approved.
 
 It calls the REST API directly with a personal token rather than going through
 the ClickUp MCP connector, which is rate-limited much harder.
@@ -47,8 +48,8 @@ From the repo root, use `bin/clickup ...` (the same as
 | `chat channels` | Chat channels, DMs and group DMs |
 | `chat messages <channel_id>` | The latest ~100 messages in a channel, with thread replies |
 | `normalize <raw_dir>` | Offline: turns a raw snapshot into Messages (no token needed) |
-| `comment <id> --text-file F [--confirm]` | Posts a task comment |
-| `status <id> <status> --comment-file F [--confirm]` | Posts the comment, then changes the status |
+| `comment <id> --text-file F [--confirm --expect-sha256 H]` | Posts a task comment |
+| `status <id> <status> --comment-file F [--confirm --expect-sha256 H]` | Posts the comment, then changes the status |
 
 ```bash
 bin/clickup whoami --json
@@ -60,9 +61,9 @@ bin/clickup chat channels
 bin/clickup chat messages <channel_id> --json
 bin/clickup normalize clients/clickup/tests/fixtures/raw/inbox --json
 
-bin/clickup comment abc123 --text-file drafts/reply.txt             # preview, exit 3
-bin/clickup comment abc123 --text-file drafts/reply.txt --confirm   # posts
-bin/clickup status abc123 "in review" --comment-file drafts/why.txt --confirm
+bin/clickup comment abc123 --text-file drafts/reply.txt     # preview + "sha256: <H>", exit 3
+bin/clickup comment abc123 --text-file drafts/reply.txt --confirm --expect-sha256 <H>  # posts
+bin/clickup status abc123 "in review" --comment-file drafts/why.txt --confirm --expect-sha256 <H>
 ```
 
 `inbox`, `task`, `chat messages` and `normalize` print **Messages** in the format
@@ -81,7 +82,8 @@ shared with the Slack client:
 `{"id", "name", "status", "url", "list", "assignees", "date_updated"}`.
 
 Exit codes: `0` ok, `1` config/API error, `2` usage error, `3` write refused
-because `--confirm` was not given.
+because `--confirm` was not given, `4` `--confirm` refused because
+`--expect-sha256` is missing, malformed or not the hash of the text file.
 
 Network verbs save the raw API responses to `.cache/raw/clickup/<UTC timestamp>/`
 (gitignored) and print that path to stderr. Re-run `normalize` on the path to
@@ -90,8 +92,17 @@ reproduce the output without calling ClickUp again.
 ## Safety
 
 - **Writes need `--confirm`.** Without it, `comment` and `status` print exactly
-  what would be sent (target task, full text, new status) and exit 3. They make
-  **no network call at all**, so the preview works even without a token.
+  what would be sent (target task, full text, new status) and `sha256: <H>`, the
+  hash of the text file's bytes, and exit 3. They make **no network call at
+  all**, so the preview works even without a token.
+- **Writes are bound to the approved text.** `--confirm` also needs
+  `--expect-sha256 <H>`. The file is read once (a regular file, or a symlink to
+  one; FIFOs, devices and directories are refused without blocking), hashed,
+  and compared before any request; a missing or different hash exits 4 having
+  sent nothing. The comment posted is derived from exactly the bytes hashed.
+- **Each option once, never abbreviated.** A repeated option is a usage error
+  (argparse would keep the last one), and `--tex`/`--conf` are not accepted as
+  `--text-file`/`--confirm`.
 - **Text comes only from a file** (`--text-file`, `--comment-file`). It is never
   interpolated from a shell string, so `$(...)`, backticks and quotes reach
   ClickUp literally. Trailing whitespace is trimmed. An empty file is refused.

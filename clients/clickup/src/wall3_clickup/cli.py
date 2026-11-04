@@ -1,11 +1,14 @@
 """`clickup` -- read ClickUp for the harness; write only with --confirm.
 
 Exit codes: 0 ok, 1 config/API error, 2 usage error (argparse),
-3 write refused because --confirm was not given.
+3 write refused because --confirm was not given,
+4 --confirm given without a matching --expect-sha256 (the approved-text hash).
 
 Write verbs (`comment`, `status`) take their text only from a file, never
 from a shell-interpolated string, and without `--confirm` they print exactly
-what would be sent and exit 3 having made no network call at all.
+what would be sent, plus the sha256 of the file's bytes, and exit 3 having made
+no network call at all. With `--confirm` they also need `--expect-sha256` equal
+to that digest; the file is read once and the bytes hashed are the bytes sent.
 """
 
 from __future__ import annotations
@@ -21,6 +24,15 @@ from datetime import timedelta
 from pathlib import Path
 from typing import Any
 
+from .approval import (
+    EXIT_HASH_MISMATCH,
+    FlagOnce,
+    StoreOnce,
+    TextFileError,
+    hash_problem,
+    read_text_bytes,
+    sha256_hex,
+)
 from .client import (
     ClickUpAPIError,
     ClickUpAuthError,
@@ -43,6 +55,7 @@ from .normalize import (
 EXIT_OK = 0
 EXIT_ERROR = 1
 EXIT_REFUSED = 3
+EXIT_HASH = EXIT_HASH_MISMATCH
 
 LIST_MAX_PAGES = 5  # mine / search: up to 500 tasks
 CHANNEL_LIST_MAX_PAGES = 5
@@ -161,14 +174,35 @@ def _print_tasks(tasks: list[dict[str, Any]], as_json: bool) -> None:
         print("(no tasks)")
 
 
-def _read_text_file(path: Path) -> str:
-    try:
-        text = path.read_text(encoding="utf-8").rstrip()
-    except OSError as exc:
-        raise ConfigError(f"cannot read {path}: {exc}") from exc
-    if not text:
-        raise ConfigError(f"{path} is empty; refusing to post an empty comment")
-    return text
+class _Approved:
+    """A comment file read exactly once: its bytes, their sha256, and the text to post.
+
+    The text is the UTF-8 decoding of those bytes with trailing whitespace
+    stripped (as before). It is derived from the hashed bytes only; the file is
+    never read again.
+    """
+
+    def __init__(self, path: str) -> None:
+        try:
+            data = read_text_bytes(path)
+        except TextFileError as exc:
+            raise ConfigError(str(exc)) from exc
+        try:
+            decoded = data.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            raise ConfigError(f"{path} is not UTF-8") from exc
+        self.text = decoded.rstrip()
+        if not self.text:
+            raise ConfigError(f"{path} is empty; refusing to post an empty comment")
+        self.sha256 = sha256_hex(data)
+
+
+def _hash_refusal(args: argparse.Namespace, approved: _Approved) -> int | None:
+    problem = hash_problem(args.expect_sha256, approved.sha256)
+    if problem is None:
+        return None
+    print(f"error: {problem}", file=sys.stderr)
+    return EXIT_HASH
 
 
 # ---------------------------------------------------------------- verbs
@@ -319,17 +353,31 @@ def cmd_normalize(args: argparse.Namespace, ctx: _Context) -> int:
     return EXIT_OK
 
 
-def _preview(actions: list[dict[str, str]], as_json: bool) -> int:
-    if as_json:
-        _emit_json({"dry_run": True, "actions": actions})
+def _preview(actions: list[dict[str, str]], approved: _Approved, args: argparse.Namespace) -> int:
+    verdict = None
+    if args.expect_sha256 is not None:
+        problem = hash_problem(args.expect_sha256, approved.sha256)
+        verdict = "matches" if problem is None else problem
+    if args.json:
+        out: dict[str, Any] = {"dry_run": True, "sha256": approved.sha256, "actions": actions}
+        if verdict is not None:
+            out["expect_sha256"] = verdict
+        _emit_json(out)
     else:
-        print("DRY RUN -- nothing was sent. Re-run with --confirm to perform:")
+        print("DRY RUN -- nothing was sent. Once Don approves, re-run with --confirm to perform:")
         for number, action in enumerate(actions, start=1):
             print(f"\n[{number}] {action['method']} {action['description']}")
             if "text" in action:
                 print(f"----- text ({len(action['text'])} chars) -----")
                 print(action["text"])
                 print("----- end -----")
+        print(f"\nsha256: {approved.sha256}")
+        if verdict is not None:
+            print(f"--expect-sha256: {verdict}")
+        print(
+            "To perform exactly this, re-run the same command with "
+            f"--confirm --expect-sha256 {approved.sha256}"
+        )
     return EXIT_REFUSED
 
 
@@ -344,10 +392,13 @@ def _comment_action(task_id: str, text: str) -> dict[str, str]:
 
 def cmd_comment(args: argparse.Namespace, ctx: _Context) -> int:
     task_id = safe_component(args.task_id)
-    text = _read_text_file(Path(args.text_file))
+    approved = _Approved(args.text_file)
     if not args.confirm:
-        return _preview([_comment_action(task_id, text)], args.json)
-    created = ctx.client.add_comment(task_id, text)
+        return _preview([_comment_action(task_id, approved.text)], approved, args)
+    refused = _hash_refusal(args, approved)
+    if refused is not None:
+        return refused
+    created = ctx.client.add_comment(task_id, approved.text)
     comment_id = str(created.get("id", ""))
     out = {
         "task_id": task_id,
@@ -363,11 +414,11 @@ def cmd_comment(args: argparse.Namespace, ctx: _Context) -> int:
 
 def cmd_status(args: argparse.Namespace, ctx: _Context) -> int:
     task_id = safe_component(args.task_id)
-    text = _read_text_file(Path(args.comment_file))
+    approved = _Approved(args.comment_file)
     if not args.confirm:
         return _preview(
             [
-                _comment_action(task_id, text),
+                _comment_action(task_id, approved.text),
                 {
                     "method": "PUT",
                     "description": f"status of task {task_id} -> {args.status!r}",
@@ -375,9 +426,13 @@ def cmd_status(args: argparse.Namespace, ctx: _Context) -> int:
                     "status": args.status,
                 },
             ],
-            args.json,
+            approved,
+            args,
         )
-    created = ctx.client.add_comment(task_id, text)
+    refused = _hash_refusal(args, approved)
+    if refused is not None:
+        return refused
+    created = ctx.client.add_comment(task_id, approved.text)
     comment_id = str(created.get("id", ""))
     if not args.json:
         print(f"posted comment {comment_id} on {task_id}")
@@ -401,29 +456,39 @@ def cmd_status(args: argparse.Namespace, ctx: _Context) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
+    # allow_abbrev=False on every parser: otherwise `--tex f --conf` silently means
+    # `--text-file f --confirm`. Every option is StoreOnce/FlagOnce: argparse keeps
+    # the *last* of a repeated option, so a reviewer reading left to right would
+    # see a different file than the one posted.
     parser = argparse.ArgumentParser(
-        prog="clickup", description="Read ClickUp; write only with --confirm."
+        prog="clickup", description="Read ClickUp; write only with --confirm.", allow_abbrev=False
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
     def add(name: str, func: Callable[..., int], help_text: str, *, parent: Any = sub) -> Any:
-        p = parent.add_parser(name, help=help_text)
+        p = parent.add_parser(name, help=help_text, allow_abbrev=False)
         p.set_defaults(func=func)
-        p.add_argument("--json", action="store_true", help="JSONL output")
+        p.add_argument("--json", action=FlagOnce, help="JSONL output")
         return p
 
     add("whoami", cmd_whoami, "the token's user; lists workspaces if CLICKUP_TEAM_ID is unset")
     p = add("inbox", cmd_inbox, "recent comments/chat that mention, DM or concern me")
-    p.add_argument("--since", type=parse_since, default=parse_since("24h"), help="30m, 4h, 24h, 7d")
+    p.add_argument(
+        "--since",
+        action=StoreOnce,
+        type=parse_since,
+        default=parse_since("24h"),
+        help="30m, 4h, 24h, 7d",
+    )
     p = add("task", cmd_task, "one task (and its comments with --comments)")
     p.add_argument("task_id")
-    p.add_argument("--comments", action="store_true")
+    p.add_argument("--comments", action=FlagOnce)
     p = add("search", cmd_search, "client-side match over recently updated tasks")
     p.add_argument("query")
     p = add("mine", cmd_mine, "tasks assigned to me")
-    p.add_argument("--status", default=None)
+    p.add_argument("--status", action=StoreOnce, default=None)
 
-    chat = sub.add_parser("chat", help="v3 Chat (experimental API)")
+    chat = sub.add_parser("chat", help="v3 Chat (experimental API)", allow_abbrev=False)
     chat_sub = chat.add_subparsers(dest="chat_command", required=True)
     add("channels", cmd_chat_channels, "list chat channels", parent=chat_sub)
     p = add("messages", cmd_chat_messages, "latest messages in one channel", parent=chat_sub)
@@ -434,14 +499,16 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = add("comment", cmd_comment, "post a comment (preview unless --confirm)")
     p.add_argument("task_id")
-    p.add_argument("--text-file", required=True)
-    p.add_argument("--confirm", action="store_true")
+    p.add_argument("--text-file", action=StoreOnce, required=True)
+    p.add_argument("--expect-sha256", action=StoreOnce, default=None, help="from the dry run")
+    p.add_argument("--confirm", action=FlagOnce)
 
     p = add("status", cmd_status, "comment, then change status (preview unless --confirm)")
     p.add_argument("task_id")
     p.add_argument("status")
-    p.add_argument("--comment-file", required=True)
-    p.add_argument("--confirm", action="store_true")
+    p.add_argument("--comment-file", action=StoreOnce, required=True)
+    p.add_argument("--expect-sha256", action=StoreOnce, default=None, help="from the dry run")
+    p.add_argument("--confirm", action=FlagOnce)
     return parser
 
 

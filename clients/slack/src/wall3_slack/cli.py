@@ -1,6 +1,7 @@
 """``slack`` CLI. Human-readable by default, JSONL (one contract Message per line) with --json.
 
-Exit codes: 0 ok, 1 config/API error, 3 write refused because --confirm was absent.
+Exit codes: 0 ok, 1 config/API error, 3 write refused because --confirm was absent,
+4 --confirm given without a matching --expect-sha256 (the approved-text hash).
 (argparse usage errors exit 2, as argparse always does.)
 """
 
@@ -15,6 +16,15 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from .approval import (
+    EXIT_HASH_MISMATCH,
+    FlagOnce,
+    StoreOnce,
+    TextFileError,
+    hash_problem,
+    read_text_bytes,
+    sha256_hex,
+)
 from .client import SlackAPIError, SlackClient
 from .config import ConfigError, SlackConfig, raw_cache_root
 from .extract import (
@@ -33,6 +43,7 @@ from .normalize.fields import user_display_name
 EXIT_OK = 0
 EXIT_ERROR = 1
 EXIT_REFUSED = 3
+EXIT_HASH = EXIT_HASH_MISMATCH
 
 _SINCE = re.compile(r"^(\d+)([mhd])$")
 _PERMALINK = re.compile(r"/archives/([A-Z0-9]+)/p(\d{7,})")
@@ -211,24 +222,44 @@ def cmd_normalize(args: argparse.Namespace) -> int:
 
 
 def cmd_send(args: argparse.Namespace) -> int:
-    path = Path(args.text_file)
-    if not path.is_file():
-        print(f"slack: --text-file not found: {path}", file=sys.stderr)
+    # Read once. The bytes read here are the bytes hashed and the bytes posted.
+    try:
+        data = read_text_bytes(args.text_file)
+    except TextFileError as exc:
+        print(f"slack: --text-file: {exc}", file=sys.stderr)
         return EXIT_ERROR
-    text = path.read_text(encoding="utf-8")
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        print(f"slack: --text-file is not UTF-8: {args.text_file}", file=sys.stderr)
+        return EXIT_ERROR
     if not text.strip():
-        print(f"slack: --text-file is empty: {path}", file=sys.stderr)
+        print(f"slack: --text-file is empty: {args.text_file}", file=sys.stderr)
         return EXIT_ERROR
+    digest = sha256_hex(data)
 
     if not args.confirm:
         # Preview only. No client is constructed, so no network call of any kind.
-        print("DRY RUN -- nothing was sent. Re-run with --confirm to post this as you.")
+        print("DRY RUN -- nothing was sent.")
         print(f"channel:   {args.channel}")
         print(f"thread_ts: {args.thread_ts or '(none: top-level message)'}")
         print("----- text -----")
         print(text, end="" if text.endswith("\n") else "\n")
         print("----- end -----")
+        print(f"sha256: {digest}")
+        if args.expect_sha256 is not None:
+            verdict = hash_problem(args.expect_sha256, digest)
+            print("--expect-sha256: matches" if verdict is None else f"--expect-sha256: {verdict}")
+        print(
+            "To post exactly this text once Don approves it, re-run the same command with "
+            f"--confirm --expect-sha256 {digest}"
+        )
         return EXIT_REFUSED
+
+    problem = hash_problem(args.expect_sha256, digest)
+    if problem is not None:
+        print(f"slack: {problem}", file=sys.stderr)
+        return EXIT_HASH
 
     client = make_client()
     posted = client.chat_post_message(args.channel, text, thread_ts=args.thread_ts)
@@ -249,39 +280,45 @@ def cmd_send(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     # allow_abbrev=False everywhere: otherwise `--conf` silently means `--confirm`
     # and `--text` means `--text-file`. A send must be asked for in full.
+    # Every option is StoreOnce/FlagOnce: argparse keeps the *last* of a repeated
+    # option, so `--channel A --channel B` would preview one target and post to another.
     parser = argparse.ArgumentParser(prog="slack", description=__doc__, allow_abbrev=False)
     sub = parser.add_subparsers(dest="verb", required=True)
 
     p = sub.add_parser("whoami", allow_abbrev=False, help="who the token acts as")
-    p.add_argument("--json", action="store_true")
+    p.add_argument("--json", action=FlagOnce)
     p.set_defaults(func=cmd_whoami)
 
     p = sub.add_parser(
         "inbox", allow_abbrev=False, help="DMs, mentions and my threads since a window"
     )
-    p.add_argument("--since", default="24h", help="30m, 4h, 24h, 7d (default 24h)")
-    p.add_argument("--json", action="store_true")
+    p.add_argument(
+        "--since", action=StoreOnce, default="24h", help="30m, 4h, 24h, 7d (default 24h)"
+    )
+    p.add_argument("--json", action=FlagOnce)
     p.set_defaults(func=cmd_inbox)
 
     p = sub.add_parser(
         "thread", allow_abbrev=False, help="a whole thread, by permalink or CHANNEL:ts"
     )
     p.add_argument("ref")
-    p.add_argument("--json", action="store_true")
+    p.add_argument("--json", action=FlagOnce)
     p.set_defaults(func=cmd_thread)
 
     p = sub.add_parser(
         "channel", allow_abbrev=False, help="recent messages in a channel, by name or id"
     )
     p.add_argument("ref")
-    p.add_argument("--since", default=None, help="30m, 4h, 24h, 7d (default: no window)")
-    p.add_argument("--limit", type=int, default=50)
-    p.add_argument("--json", action="store_true")
+    p.add_argument(
+        "--since", action=StoreOnce, default=None, help="30m, 4h, 24h, 7d (default: no window)"
+    )
+    p.add_argument("--limit", action=StoreOnce, type=int, default=50)
+    p.add_argument("--json", action=FlagOnce)
     p.set_defaults(func=cmd_channel)
 
     p = sub.add_parser("search", allow_abbrev=False, help="search.messages with Slack query syntax")
     p.add_argument("query")
-    p.add_argument("--json", action="store_true")
+    p.add_argument("--json", action=FlagOnce)
     p.set_defaults(func=cmd_search)
 
     p = sub.add_parser("user", allow_abbrev=False, help="look up a user by id or @name")
@@ -290,16 +327,19 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("normalize", allow_abbrev=False, help="raw dir -> messages, offline")
     p.add_argument("raw_dir")
-    p.add_argument("--json", action="store_true")
+    p.add_argument("--json", action=FlagOnce)
     p.set_defaults(func=cmd_normalize)
 
     p = sub.add_parser(
-        "send", allow_abbrev=False, help="post a message as you (requires --confirm)"
+        "send",
+        allow_abbrev=False,
+        help="post a message as you (requires --confirm --expect-sha256)",
     )
-    p.add_argument("--channel", required=True)
-    p.add_argument("--thread-ts", default=None)
-    p.add_argument("--text-file", required=True)
-    p.add_argument("--confirm", action="store_true")
+    p.add_argument("--channel", action=StoreOnce, required=True)
+    p.add_argument("--thread-ts", action=StoreOnce, default=None)
+    p.add_argument("--text-file", action=StoreOnce, required=True)
+    p.add_argument("--expect-sha256", action=StoreOnce, default=None, help="from the dry run")
+    p.add_argument("--confirm", action=FlagOnce)
     p.set_defaults(func=cmd_send)
 
     return parser

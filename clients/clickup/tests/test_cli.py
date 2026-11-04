@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from collections.abc import Mapping
 from datetime import timedelta
 from pathlib import Path
@@ -31,6 +32,10 @@ def text_file(tmp_path: Path) -> Path:
 
 
 EXPECTED_TEXT = "Thanks Alice -- merged.\nCost was $(echo 5) & `none`."
+#: sha256 of the `text_file` fixture's bytes, computed once with hashlib and pinned.
+TEXT_SHA = "b17af58326426ce5701cf2504debfc17698b9a66ba859ecdf456270e3f4a89da"
+OTHER_SHA = "f" * 64
+OK_HASH = ("--confirm", "--expect-sha256", TEXT_SHA)
 
 
 # ---------------------------------------------------------------- write refusal (exit 3)
@@ -47,13 +52,15 @@ def test_comment_without_confirm_previews_and_makes_no_request(creds, text_file,
     assert "DRY RUN" in out
     assert "task abc123" in out
     assert EXPECTED_TEXT in out
+    assert f"sha256: {TEXT_SHA}" in out.splitlines()
+    assert f"--confirm --expect-sha256 {TEXT_SHA}" in out
 
 
 def test_comment_with_confirm_posts_exactly_once(creds, text_file, capsys):
     session = FakeSession([FakeResponse(200, {"id": "458", "hist_id": "1", "date": 1})])
 
     code = main(
-        ["comment", "abc123", "--text-file", str(text_file), "--confirm", "--json"],
+        ["comment", "abc123", "--text-file", str(text_file), *OK_HASH, "--json"],
         session=session,
     )
 
@@ -91,13 +98,14 @@ def test_status_without_confirm_previews_both_steps_and_makes_no_request(creds, 
     assert EXPECTED_TEXT in out
     assert "'in review'" in out
     assert out.index("POST comment") < out.index("PUT status")
+    assert f"sha256: {TEXT_SHA}" in out.splitlines()
 
 
 def test_status_with_confirm_comments_then_sets_status(creds, text_file):
     session = FakeSession([FakeResponse(200, {"id": "459"}), FakeResponse(200, {"id": "abc123"})])
 
     code = main(
-        ["status", "abc123", "in review", "--comment-file", str(text_file), "--confirm"],
+        ["status", "abc123", "in review", "--comment-file", str(text_file), *OK_HASH],
         session=session,
     )
 
@@ -116,7 +124,7 @@ def test_status_failure_after_comment_is_reported(creds, text_file, capsys):
     )
 
     code = main(
-        ["status", "abc123", "nope", "--comment-file", str(text_file), "--confirm"],
+        ["status", "abc123", "nope", "--comment-file", str(text_file), *OK_HASH],
         session=session,
     )
 
@@ -147,11 +155,147 @@ def test_status_requires_a_comment_file():
 def test_confirmed_write_without_token_fails_cleanly(text_file, capsys):
     session = FakeSession([])
 
-    code = main(["comment", "abc123", "--text-file", str(text_file), "--confirm"], session=session)
+    code = main(["comment", "abc123", "--text-file", str(text_file), *OK_HASH], session=session)
 
     assert code == EXIT_ERROR
     assert session.calls == []
     assert "CLICKUP_API_TOKEN is not set" in capsys.readouterr().err
+
+
+# ---------------------------------------------------------------- approved-text hash (exit 4)
+
+
+def test_comment_dry_run_json_carries_sha256(creds, text_file, capsys):
+    session = FakeSession([])
+    code = main(["comment", "abc123", "--text-file", str(text_file), "--json"], session=session)
+    assert code == EXIT_REFUSED
+    out = json.loads(capsys.readouterr().out)
+    assert out["dry_run"] is True
+    assert out["sha256"] == TEXT_SHA
+    assert out["actions"][0]["text"] == EXPECTED_TEXT
+
+
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["comment", "abc123", "--text-file", "{f}", "--confirm"],
+        ["comment", "abc123", "--text-file", "{f}", "--confirm", "--expect-sha256", OTHER_SHA],
+        ["comment", "abc123", "--text-file", "{f}", "--confirm", "--expect-sha256", "nothex"],
+        ["status", "abc123", "done", "--comment-file", "{f}", "--confirm"],
+        [
+            "status",
+            "abc123",
+            "done",
+            "--comment-file",
+            "{f}",
+            "--confirm",
+            "--expect-sha256",
+            OTHER_SHA,
+        ],
+    ],
+)
+def test_confirm_without_matching_hash_exits_4_with_zero_requests(creds, text_file, capsys, argv):
+    session = FakeSession([])
+    code = main([a.replace("{f}", str(text_file)) for a in argv], session=session)
+    assert code == 4
+    assert session.calls == []
+    assert "expect-sha256" in capsys.readouterr().err
+
+
+def test_text_changed_after_preview_is_refused(creds, text_file, capsys):
+    session = FakeSession([])
+    assert main(["comment", "abc123", "--text-file", str(text_file)], session=session) == 3
+    assert f"sha256: {TEXT_SHA}" in capsys.readouterr().out
+    text_file.write_text("Swapped text.\n", encoding="utf-8")
+
+    code = main(["comment", "abc123", "--text-file", str(text_file), *OK_HASH], session=session)
+
+    assert code == 4
+    assert session.calls == []
+    assert "hash mismatch" in capsys.readouterr().err
+
+
+def test_comment_posts_the_bytes_it_hashed_without_rereading(creds, text_file, monkeypatch):
+    """A swap after the hash check (here: when the client is built) cannot change what is sent."""
+    from wall3_clickup import cli
+
+    real_client = cli.ClickUpClient
+
+    def client_after_swap(*args: Any, **kwargs: Any) -> Any:
+        text_file.write_text("Swapped after the check.\n", encoding="utf-8")
+        return real_client(*args, **kwargs)
+
+    monkeypatch.setattr(cli, "ClickUpClient", client_after_swap)
+    session = FakeSession([FakeResponse(200, {"id": "460"})])
+
+    code = main(["comment", "abc123", "--text-file", str(text_file), *OK_HASH], session=session)
+
+    assert code == EXIT_OK
+    assert text_file.read_text(encoding="utf-8") == "Swapped after the check.\n"
+    assert [c["json"]["comment_text"] for c in session.calls] == [EXPECTED_TEXT]
+
+
+def test_fifo_text_file_is_refused_without_blocking(creds, tmp_path, capsys):
+    fifo = tmp_path / "pipe"
+    os.mkfifo(fifo)
+    session = FakeSession([])
+    code = main(["comment", "abc123", "--text-file", str(fifo), *OK_HASH], session=session)
+    assert code == EXIT_ERROR
+    assert session.calls == []
+    assert "not a regular file" in capsys.readouterr().err
+
+
+def test_directory_comment_file_is_refused(creds, tmp_path, capsys):
+    session = FakeSession([])
+    code = main(["status", "abc123", "done", "--comment-file", str(tmp_path)], session=session)
+    assert code == EXIT_ERROR
+    assert session.calls == []
+    assert "not a regular file" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(
+    "extra",
+    [
+        ["--text-file", "other.txt"],
+        ["--confirm", "--confirm"],
+        ["--expect-sha256", TEXT_SHA, "--expect-sha256", TEXT_SHA],
+        ["--json", "--json"],
+    ],
+)
+def test_comment_rejects_repeated_options(creds, text_file, capsys, extra):
+    with pytest.raises(SystemExit) as excinfo:
+        main(["comment", "abc123", "--text-file", str(text_file), *extra], session=FakeSession([]))
+    assert excinfo.value.code == 2
+    assert "given more than once" in capsys.readouterr().err
+
+
+def test_status_rejects_repeated_comment_file(creds, text_file, capsys):
+    with pytest.raises(SystemExit) as excinfo:
+        main(
+            ["status", "abc", "done", "--comment-file", "a", "--comment-file", str(text_file)],
+            session=FakeSession([]),
+        )
+    assert excinfo.value.code == 2
+    assert "given more than once" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["comment", "abc123", "--tex", "{f}", "--conf"],
+        ["comment", "abc123", "--text-file", "{f}", "--conf", "--expect-sha256", TEXT_SHA],
+        ["comment", "abc123", "--text-file", "{f}", "--confirm", "--expect", TEXT_SHA],
+        ["status", "abc123", "done", "--comment", "{f}", "--confirm"],
+        ["inbox", "--sin", "4h"],
+        ["task", "abc123", "--comm"],
+    ],
+)
+def test_options_cannot_be_abbreviated(creds, text_file, argv):
+    session = FakeSession([])
+    with pytest.raises(SystemExit) as excinfo:
+        main([a.replace("{f}", str(text_file)) for a in argv], session=session)
+    assert excinfo.value.code == 2
+    assert session.calls == []
 
 
 def test_path_like_task_id_is_rejected(creds, text_file):
