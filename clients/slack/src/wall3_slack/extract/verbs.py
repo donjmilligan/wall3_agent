@@ -16,7 +16,7 @@ from .common import (
     referenced_user_ids,
     write_whoami,
 )
-from .store import RawStore
+from .store import RawStore, safe_component
 
 CHANNEL_ID = re.compile(r"^[CGD][A-Z0-9]{2,}$")
 USER_ID = re.compile(r"^[UW][A-Z0-9]{2,}$")
@@ -33,6 +33,7 @@ def _stamp(now: datetime) -> str:
 
 def _fetch_info(client: SlackClient, store: RawStore, run: RunRecord, channel: str) -> None:
     """conversations.info, for a readable container name. Missing it is not fatal."""
+    safe_component(channel)  # becomes a path component below; refuse before any call
     try:
         body = client.conversations_info(channel)
     except SlackAuthError:
@@ -41,12 +42,14 @@ def _fetch_info(client: SlackClient, store: RawStore, run: RunRecord, channel: s
         run.skipped.append(f"conversations.info {channel}: {exc.error}")
         return
     run.count("conversations.info")
-    store.write(f"conversations.info/{channel}.json", body)
+    store.write(f"conversations.info/{safe_component(channel)}.json", body)
 
 
 def extract_thread(
     client: SlackClient, out_dir: Path, *, channel: str, ts: str, now: datetime
 ) -> Path:
+    safe_component(channel)  # both become path components; refuse before any call
+    safe_component(ts)
     store = RawStore(out_dir)
     run = RunRecord(verb="thread", fetched_at=_stamp(now), params={"channel": channel, "ts": ts})
     write_whoami(client, store, run)

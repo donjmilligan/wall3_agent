@@ -15,7 +15,8 @@ _SAFE_COMPONENT = re.compile(r"^[A-Za-z0-9_.:-]+$")
 
 
 def safe_component(value: str) -> str:
-    if not _SAFE_COMPONENT.match(value) or value in {".", ".."}:
+    # fullmatch: with match(), `$` also matches before a trailing newline ("x\n").
+    if not _SAFE_COMPONENT.fullmatch(value) or value in {".", ".."}:
         raise ValueError(f"refusing to use {value!r} as a path component")
     return value
 

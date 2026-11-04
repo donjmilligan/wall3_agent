@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from ..client import SlackAPIError, SlackAuthError, SlackClient, next_cursor
-from .store import RawStore
+from .store import RawStore, UnsafeComponentError, safe_component
 
 _MENTION = re.compile(r"<@([UW][A-Z0-9]+)")
 
@@ -61,6 +61,7 @@ def fetch_history(
     max_pages: int,
     page_limit: int = 200,
 ) -> list[dict[str, Any]]:
+    safe_component(channel)  # becomes a path component below; refuse before any call
     messages: list[dict[str, Any]] = []
     last: dict[str, Any] = {}
     for i, page in enumerate(
@@ -72,7 +73,7 @@ def fetch_history(
         start=1,
     ):
         run.count("conversations.history")
-        store.write(f"conversations.history/{channel}/page-{i:03d}.json", page)
+        store.write(f"conversations.history/{safe_component(channel)}/page-{i:03d}.json", page)
         messages.extend(m for m in page.get("messages") or [] if isinstance(m, dict))
         last = page
     if next_cursor(last):
@@ -93,6 +94,8 @@ def fetch_replies(
     max_pages: int = 1,
 ) -> list[dict[str, Any]]:
     """Fetch one whole thread. ``thread_not_found`` and friends are skipped, not fatal."""
+    safe_component(channel)  # both become path components; refuse before any call
+    safe_component(ts)
     messages: list[dict[str, Any]] = []
     last: dict[str, Any] = {}
     try:
@@ -105,7 +108,11 @@ def fetch_replies(
             start=1,
         ):
             run.count("conversations.replies")
-            store.write(f"conversations.replies/{channel}-{ts}/page-{i:03d}.json", page)
+            store.write(
+                f"conversations.replies/{safe_component(channel)}-{safe_component(ts)}"
+                f"/page-{i:03d}.json",
+                page,
+            )
             messages.extend(m for m in page.get("messages") or [] if isinstance(m, dict))
             last = page
     except SlackAuthError:
@@ -150,6 +157,11 @@ def fetch_users(
     max_users: int,
 ) -> None:
     for user_id in user_ids[:max_users]:
+        try:
+            safe_component(user_id)
+        except UnsafeComponentError:
+            run.skipped.append(f"users.info {user_id!r}: not a valid user id")
+            continue
         try:
             body = client.users_info(user_id)
         except SlackAuthError:

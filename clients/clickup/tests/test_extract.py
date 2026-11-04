@@ -4,10 +4,13 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
+import pytest
+
 from tests.conftest import FakeResponse, FakeSession
 from wall3_clickup.client import ClickUpClient
 from wall3_clickup.config import ClickUpConfig
 from wall3_clickup.extract import RawWriter, extract_inbox
+from wall3_clickup.extract.raw_writer import safe_component
 
 V2 = "https://api.clickup.com/api/v2"
 V3 = "https://api.clickup.com/api/v3"
@@ -112,3 +115,17 @@ def test_raw_writer_never_overwrites_a_snapshot(tmp_path):
 
     assert first != second
     assert second.name == "20261104T160000Z-1"
+
+
+# ---------------------------------------------------------------- path components
+
+
+@pytest.mark.parametrize("value", ["abc123", "86abc", "C-1", "a_b.c:d"])
+def test_safe_component_accepts_api_ids(value):
+    assert safe_component(value) == value
+
+
+@pytest.mark.parametrize("value", ["..", ".", "../x", "a/b", "", "a b", "x\n", "x\r\n"])
+def test_safe_component_refuses_path_like_values(value):
+    with pytest.raises(ValueError, match="path component"):
+        safe_component(value)
