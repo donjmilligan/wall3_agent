@@ -1,0 +1,1 @@
+Bob found the root cause: an off-by-one in the export paginator that drops the last row. The fix is in review (https://git.acme.example/acme/app/pull/42) and he expects it to merge after QA tomorrow. Task: https://clickup.acme.example/t/fake-task-101
