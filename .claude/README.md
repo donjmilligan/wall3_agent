@@ -18,10 +18,16 @@ repo. `CLAUDE.md` at the root is the working agreement; this is the machinery.
 `.claude/settings.json` is shared and committed. It:
 
 - wires the five hooks (all `python3 "${CLAUDE_PROJECT_DIR}/.claude/hooks/<name>.py"`);
-- puts every known Slack/ClickUp write tool, and the CLI write verbs
-  (`bin/slack send`, `bin/clickup comment`, `bin/clickup status`), under
-  `permissions.ask`, so each one prompts even if you allow-list broadly;
-- denies `rm -rf`, force pushes, `git reset --hard` and `--no-verify`.
+- puts every known Slack/ClickUp write tool (all 51 write tools the claude.ai
+  connectors exposed on 2026-11-04; `tests/hooks/test_settings.py` checks the
+  list against that inventory), and the CLI write verbs (`bin/slack send`,
+  `bin/clickup comment`, `bin/clickup status`), under `permissions.ask`, so each
+  one prompts even if you allow-list broadly;
+- runs `outbound_guard.py` with `onFailure: "block"`, so a crash or timeout of
+  the guard blocks the call instead of letting it through;
+- denies `rm -rf`, force pushes, `git reset --hard` and `--no-verify`; `Read` of
+  `.env` / `.env.*` (not `.env.example`); and `curl`/`wget` straight to
+  `slack.com/api` or `api.clickup.com` (a second net: the hook is the first).
 
 Rule syntax follows https://code.claude.com/docs/en/permissions: Bash rules
 are `Bash(<command> *)` (a trailing ` *` also matches the bare command), MCP

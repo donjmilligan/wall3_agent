@@ -14,6 +14,7 @@
       "mcp__claude_ai_Slack__slack_create_list",
       "mcp__claude_ai_Slack__slack_send_message_draft",
       "mcp__claude_ai_Slack__slack_complete_file_upload",
+      "mcp__claude_ai_Slack__slack_get_file_upload_url",
       "mcp__claude_ai_ClickUp__clickup_create_task_comment",
       "mcp__claude_ai_ClickUp__clickup_create_comment",
       "mcp__claude_ai_ClickUp__clickup_send_chat_message",
@@ -28,6 +29,30 @@
       "mcp__claude_ai_ClickUp__clickup_move_task",
       "mcp__claude_ai_ClickUp__clickup_merge_tasks",
       "mcp__claude_ai_ClickUp__clickup_execute_operator",
+      "mcp__claude_ai_ClickUp__clickup_add_tag_to_task",
+      "mcp__claude_ai_ClickUp__clickup_remove_tag_from_task",
+      "mcp__claude_ai_ClickUp__clickup_add_task_dependency",
+      "mcp__claude_ai_ClickUp__clickup_remove_task_dependency",
+      "mcp__claude_ai_ClickUp__clickup_add_task_link",
+      "mcp__claude_ai_ClickUp__clickup_remove_task_link",
+      "mcp__claude_ai_ClickUp__clickup_add_task_to_list",
+      "mcp__claude_ai_ClickUp__clickup_remove_task_from_list",
+      "mcp__claude_ai_ClickUp__clickup_add_time_entry",
+      "mcp__claude_ai_ClickUp__clickup_start_time_tracking",
+      "mcp__claude_ai_ClickUp__clickup_stop_time_tracking",
+      "mcp__claude_ai_ClickUp__clickup_attach_task_file",
+      "mcp__claude_ai_ClickUp__clickup_request_attachment_upload",
+      "mcp__claude_ai_ClickUp__clickup_create_document",
+      "mcp__claude_ai_ClickUp__clickup_create_document_page",
+      "mcp__claude_ai_ClickUp__clickup_update_document_page",
+      "mcp__claude_ai_ClickUp__clickup_create_folder",
+      "mcp__claude_ai_ClickUp__clickup_update_folder",
+      "mcp__claude_ai_ClickUp__clickup_create_list",
+      "mcp__claude_ai_ClickUp__clickup_create_list_in_folder",
+      "mcp__claude_ai_ClickUp__clickup_update_list",
+      "mcp__claude_ai_ClickUp__clickup_create_reminder",
+      "mcp__claude_ai_ClickUp__clickup_update_reminder",
+      "mcp__claude_ai_ClickUp__clickup_create_space_tag",
       "Bash(bin/slack send *)",
       "Bash(bin/clickup comment *)",
       "Bash(bin/clickup status *)",
@@ -47,7 +72,14 @@
       "Bash(git push * -f *)",
       "Bash(git reset --hard *)",
       "Bash(git commit * --no-verify*)",
-      "Bash(git push * --no-verify*)"
+      "Bash(git push * --no-verify*)",
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(!.env.example)",
+      "Bash(curl *slack.com/api*)",
+      "Bash(curl *api.clickup.com*)",
+      "Bash(wget *slack.com/api*)",
+      "Bash(wget *api.clickup.com*)"
     ]
   },
   "hooks": {
@@ -69,7 +101,8 @@
           {
             "type": "command",
             "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/hooks/outbound_guard.py\"",
-            "timeout": 10
+            "timeout": 10,
+            "onFailure": "block"
           },
           {
             "type": "command",
@@ -84,7 +117,8 @@
           {
             "type": "command",
             "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/hooks/outbound_guard.py\"",
-            "timeout": 10
+            "timeout": 10,
+            "onFailure": "block"
           }
         ]
       }

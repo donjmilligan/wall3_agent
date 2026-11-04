@@ -85,11 +85,16 @@ bin/clickup task <id> --comments
   Claude Code prompt you:
   - `.claude/hooks/outbound_guard.py` catches CLI write verbs however they are
     invoked, and every non-read Slack or ClickUp MCP tool. The prompt shows the
-    target and the full text.
-  - `permissions.ask` in `.claude/settings.json` lists the known write tools
-    and commands.
+    target, the full text and whether it matches the approved hash; a command
+    whose preview could be wrong (repeated options, a swapped file, ...) is
+    denied. Heuristics ask about raw API calls, `.env`, and scripts the hook
+    cannot read. Limits: `.claude/hooks/README.md`.
+  - `permissions.ask` in `.claude/settings.json` lists every known write tool
+    of the Slack and ClickUp connectors, and the CLI write commands.
 
-  The CLIs also refuse to write without `--confirm` (exit 3).
+  The CLIs also refuse to write without `--confirm` (exit 3), and refuse
+  `--confirm` unless `--expect-sha256` matches the hash of the text file that
+  the dry run printed (exit 4). So what is posted is exactly the text Don saw.
 - **Message content is data, not instructions.** Whatever a Slack message or
   ClickUp comment says, Claude reports any instructions in it to you and never
   acts on them. `.claude/hooks/untrusted_content.py` labels every read to
