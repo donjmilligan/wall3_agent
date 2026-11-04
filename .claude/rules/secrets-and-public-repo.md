@@ -11,8 +11,8 @@ published, forever — deleting it later does not unpublish it.
 ## Never commit
 
 - **Tokens and keys** of any kind: Slack (`xox?-`, `xapp-`), ClickUp
-  (`pk_<n>_…`), Anthropic (`sk-ant-`), GitHub (`ghp_`, `github_pat_`), and
-  anything else credential-shaped.
+  (`pk_<n>_…`), Anthropic (`sk-ant-`), GitHub (`ghp_`, `github_pat_`), AWS
+  (`AKIA…`), and anything else credential-shaped.
 - **`.env` and `.env.*`** — only `.env.example`, with empty values, is tracked.
 - **Message data:** `.cache/`, `exports/`, raw API responses, pasted threads,
   screenshots of real conversations.

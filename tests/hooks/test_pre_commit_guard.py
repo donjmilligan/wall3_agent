@@ -19,6 +19,7 @@ FAKE_TOKENS = {
     "Anthropic key": "sk-" + "ant-" + "api03-" + "x" * 24,
     "GitHub token": "gh" + "p_" + "a" * 36,
     "GitHub PAT": "github" + "_pat_" + "11ABC" + "x" * 30,
+    "AWS access key id": "AK" + "IA" + "ABCDEFGHIJKLMNOP",
 }
 
 
