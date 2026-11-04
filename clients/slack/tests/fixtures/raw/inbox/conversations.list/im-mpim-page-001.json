@@ -1,0 +1,31 @@
+{
+  "ok": true,
+  "channels": [
+    {
+      "id": "D000ALICE",
+      "created": 1767225600,
+      "is_im": true,
+      "is_org_shared": false,
+      "user": "U000ALICE",
+      "is_user_deleted": false,
+      "priority": 0
+    },
+    {
+      "id": "G000MPIM",
+      "name": "mpdm-alice--bob--don-1",
+      "is_channel": false,
+      "is_group": true,
+      "is_im": false,
+      "is_mpim": true,
+      "is_private": true,
+      "created": 1767225600,
+      "updated": 1793790600000,
+      "is_archived": false,
+      "is_open": true,
+      "priority": 0
+    }
+  ],
+  "response_metadata": {
+    "next_cursor": ""
+  }
+}

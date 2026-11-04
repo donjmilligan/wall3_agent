@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "query": "<@U000DON> after:2026-11-01",
+  "messages": {
+    "matches": [
+      {
+        "iid": "00000000-0000-0000-0000-000000000001",
+        "team": "T000EXAMPLE",
+        "type": "message",
+        "channel": {
+          "id": "C000GENERAL",
+          "is_ext_shared": false,
+          "is_mpim": false,
+          "is_org_shared": false,
+          "is_pending_ext_shared": false,
+          "is_private": false,
+          "is_shared": false,
+          "name": "general",
+          "pending_shared": []
+        },
+        "user": "U000ALICE",
+        "username": "alice",
+        "ts": "1793793600.000100",
+        "text": "<@U000DON> can you confirm the on-call schedule? Q&amp;A is in <#C000GENERAL|general> at 3",
+        "permalink": "https://example.slack.com/archives/C000GENERAL/p1793793600000100"
+      }
+    ],
+    "pagination": {
+      "first": 1,
+      "last": 1,
+      "page": 1,
+      "page_count": 1,
+      "per_page": 100,
+      "total_count": 1
+    },
+    "paging": {
+      "count": 100,
+      "page": 1,
+      "pages": 1,
+      "total": 1
+    },
+    "total": 1
+  }
+}
