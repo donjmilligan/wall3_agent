@@ -23,7 +23,7 @@ variable assignments (`x=bin/slack; $x send`), `cd` tracking, and a classifier
 for every way the CLIs can be invoked (`bin/slack`, bare `slack`,
 `bash bin/slack`, `uv [opts] run [opts] slack`, `uv run -m wall3_slack`,
 `uv tool run` / `uvx`, `python [-X/-W/-O ...] -m wall3_slack`, a path into
-`wall3_slack/`). `Analysis.clean` is False when quoting may have been lost; no
+the `wall3_slack` package). `Analysis.clean` is False when quoting may have been lost; no
 exemption is granted on an unclean parse. Write verbs are listed in
 `WRITE_VERBS`; a new CLI write verb must be added there and to
 `outbound_guard._SPECS` with a test.
