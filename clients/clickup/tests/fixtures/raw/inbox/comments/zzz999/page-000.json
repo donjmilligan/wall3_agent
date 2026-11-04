@@ -1,0 +1,36 @@
+{
+  "comments": [
+    {
+      "id": "5401",
+      "comment": [
+        {
+          "text": "Heads up "
+        },
+        {
+          "type": "tag",
+          "user": {
+            "id": 1001
+          }
+        },
+        {
+          "text": ", this one is yours."
+        }
+      ],
+      "comment_text": "Heads up @Don Example, this one is yours.",
+      "user": {
+        "id": 1002,
+        "username": "Alice Example",
+        "email": "alice@example.com",
+        "color": "#ff7800",
+        "initials": "AE",
+        "profilePicture": null
+      },
+      "resolved": false,
+      "assignee": null,
+      "assigned_by": null,
+      "reactions": [],
+      "date": "1793790000000",
+      "reply_count": "0"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "id": "5101",
+      "comment": [
+        {
+          "text": "Pinging "
+        },
+        {
+          "type": "tag",
+          "user": {
+            "id": 1002,
+            "username": "Alice Example"
+          },
+          "text": "@Alice Example"
+        },
+        {
+          "text": " about the deploy window."
+        }
+      ],
+      "comment_text": "Pinging @Alice Example about the deploy window.",
+      "user": {
+        "id": 1003,
+        "username": "Bob Example",
+        "email": "bob@example.com",
+        "color": "#1b998b",
+        "initials": "BE",
+        "profilePicture": null
+      },
+      "resolved": false,
+      "assignee": null,
+      "assigned_by": null,
+      "reactions": [],
+      "date": "1793779200000",
+      "reply_count": "0"
+    },
+    {
+      "id": "5100",
+      "comment": [
+        {
+          "text": "Can someone check the redirect?"
+        }
+      ],
+      "comment_text": "Can someone check the redirect?",
+      "user": {
+        "id": 1002,
+        "username": "Alice Example",
+        "email": "alice@example.com",
+        "color": "#ff7800",
+        "initials": "AE",
+        "profilePicture": null
+      },
+      "resolved": false,
+      "assignee": null,
+      "assigned_by": null,
+      "reactions": [],
+      "date": "1793527200000",
+      "reply_count": "0"
+    }
+  ]
+}

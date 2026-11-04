@@ -1,0 +1,13 @@
+{
+  "user": {
+    "id": 1001,
+    "username": "Don Example",
+    "email": "don@example.com",
+    "color": "#7b68ee",
+    "initials": "DE",
+    "profilePicture": null,
+    "week_start_day": 0,
+    "global_font_support": false,
+    "timezone": "UTC"
+  }
+}
