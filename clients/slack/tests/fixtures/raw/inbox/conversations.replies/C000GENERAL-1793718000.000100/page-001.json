@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "messages": [
+    {
+      "type": "message",
+      "user": "U000DON",
+      "text": "Postmortem draft is up",
+      "ts": "1793718000.000100",
+      "thread_ts": "1793718000.000100",
+      "reply_count": 2,
+      "reply_users": [
+        "U000BOB"
+      ],
+      "latest_reply": "1793799000.000100"
+    },
+    {
+      "type": "message",
+      "user": "U000BOB",
+      "text": "Left comments on section 2",
+      "ts": "1793797200.000100",
+      "thread_ts": "1793718000.000100",
+      "parent_user_id": "U000DON"
+    },
+    {
+      "type": "message",
+      "subtype": "bot_message",
+      "bot_id": "B000BOT",
+      "username": "reminders",
+      "bot_profile": {
+        "id": "B000BOT",
+        "name": "reminders",
+        "deleted": false
+      },
+      "text": "Reminder: postmortem review is tomorrow",
+      "ts": "1793799000.000100",
+      "thread_ts": "1793718000.000100"
+    }
+  ],
+  "has_more": false,
+  "response_metadata": {
+    "next_cursor": ""
+  }
+}

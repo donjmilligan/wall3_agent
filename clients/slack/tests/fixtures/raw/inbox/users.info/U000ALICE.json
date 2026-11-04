@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "user": {
+    "id": "U000ALICE",
+    "team_id": "T000EXAMPLE",
+    "name": "alice",
+    "deleted": false,
+    "real_name": "Alice Example",
+    "tz": "UTC",
+    "is_bot": false,
+    "profile": {
+      "real_name": "Alice Example",
+      "display_name": "Alice Example",
+      "title": ""
+    }
+  }
+}
