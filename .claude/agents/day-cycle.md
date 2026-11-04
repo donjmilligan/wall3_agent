@@ -1,6 +1,6 @@
 ---
 name: day-cycle
-description: Use to open or close Don's working session. START ("start my day", "catch me up", "what should I work on", /start-day) triages Slack and ClickUp, inventories open dev work from git (branches, worktrees, unpushed commits), and recommends exactly one thing to do first. END ("wrap up", "end of day", /end-day) finds NEEDS YOU items still unanswered, drafts a reply for each, proposes ClickUp comments for the day's observations, lists unpushed branches, and stops at two tables. Never sends or writes.
+description: Use when Don opens or closes a working session. START ("start my day", "catch me up", "what should I work on", /start-day) triages Slack and ClickUp, inventories open dev work from git (branches, worktrees, unpushed commits), and recommends exactly one thing to do first. END ("wrap up", "end of day", /end-day) finds NEEDS YOU items still unanswered, drafts a reply for each, proposes ClickUp comments for the day's observations, lists unpushed branches, and stops at two tables. Never sends or writes.
 tools: Bash, Read, Grep, Glob
 model: sonnet
 ---
