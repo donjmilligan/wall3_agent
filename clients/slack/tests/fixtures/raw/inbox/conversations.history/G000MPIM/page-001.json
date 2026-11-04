@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "messages": [
+    {
+      "type": "message",
+      "user": "U000DON",
+      "text": "Works for me <@U000BOB>",
+      "ts": "1793790600.000100"
+    },
+    {
+      "type": "message",
+      "user": "U000BOB",
+      "text": "Lunch at 1?",
+      "ts": "1793790000.000100"
+    },
+    {
+      "type": "message",
+      "subtype": "channel_join",
+      "user": "U000ALICE",
+      "text": "<@U000ALICE> has joined the channel",
+      "ts": "1793788200.000100"
+    }
+  ],
+  "has_more": false,
+  "pin_count": 0,
+  "response_metadata": {
+    "next_cursor": ""
+  }
+}

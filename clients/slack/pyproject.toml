@@ -37,6 +37,7 @@ select = ["E", "F", "I", "UP", "B"]
 
 [tool.pyright]
 include = ["src", "tests"]
+extraPaths = ["tests"]
 pythonVersion = "3.12"
 venvPath = "."
 venv = ".venv"

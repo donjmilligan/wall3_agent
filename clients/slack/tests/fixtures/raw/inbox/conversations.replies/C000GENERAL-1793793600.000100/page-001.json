@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "messages": [
+    {
+      "type": "message",
+      "user": "U000ALICE",
+      "text": "<@U000DON> can you confirm the on-call schedule? Q&amp;A is in <#C000GENERAL|general> at 3",
+      "ts": "1793793600.000100"
+    }
+  ],
+  "has_more": false,
+  "response_metadata": {
+    "next_cursor": ""
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "user": {
+    "id": "U000DON",
+    "team_id": "T000EXAMPLE",
+    "name": "don",
+    "deleted": false,
+    "real_name": "Don Example",
+    "tz": "UTC",
+    "is_bot": false,
+    "profile": {
+      "real_name": "Don Example",
+      "display_name": "Don Example",
+      "title": ""
+    }
+  }
+}
