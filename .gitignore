@@ -1,0 +1,23 @@
+# Secrets — never committed. .env.example is the only tracked env file.
+.env
+.env.*
+!.env.example
+
+# Message caches and exports — real third-party content, never committed.
+.cache/
+exports/
+
+# Python / tooling
+**/.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.pyright/
+
+# Claude Code per-developer state
+.claude/settings.local.json
+.claude/worktrees/
+
+# OS noise
+.DS_Store
