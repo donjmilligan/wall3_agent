@@ -21,8 +21,8 @@ write code, edit files, create branches or touch a task tracker.
 - **The plan is PROPOSED until Don approves it.** You never implement it,
   dispatch it, or describe it as decided.
 - **Every task is one action on one file producing one observable result.**
-  "Update the client" is not a task. "Add `--since` to `src/cli.py` `list`
-  parser; `list --since bad` exits 2" is.
+  "Update the client" is not a task. "Add `--since` to the `mine` parser in
+  `clients/clickup/src/wall3_clickup/cli.py`; `clickup mine --since bad` exits 2" is.
 - **≤ 40 task rows per phase.** Longer means the work is several phases; split it,
   and make each phase independently shippable.
 - **Discover, do not assume.** Every path, function, flag or gate in the plan was

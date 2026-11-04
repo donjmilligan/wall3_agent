@@ -43,10 +43,12 @@ Arguments: `$ARGUMENTS`
   as done.
 - **No merges, and no PRs unless Don asks for them.** No `--no-verify`, no
   force-push, no `git stash`, no `reset --hard`. Agents never set a task to Done.
-- **Outbound actions are listed in the plan.** Every tracker comment, status change
-  and channel post the run will make is listed in the approved plan; that approval
-  covers those, and nothing else. Anything new is asked for
-  (`.claude/rules/messaging-safety.md`, `.claude/rules/task-lifecycle.md`).
+- **Outbound actions are listed in the plan, and each is still approved on its own.**
+  Every tracker comment, status change and channel post the run will make is listed
+  in the plan, so Don can see the shape of them up front. Plan approval is not send
+  approval: each write still shows Don its exact text and target and waits for his
+  yes, and the outbound hook asks again (`.claude/rules/messaging-safety.md` §2,
+  `.claude/rules/task-lifecycle.md`). Anything not in the plan is asked for first.
 - **A ruling the run needs and does not have stops that slice, not the run.**
 
 ## Phase 1: Plan (in plan mode)
