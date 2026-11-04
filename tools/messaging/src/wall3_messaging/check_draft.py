@@ -38,7 +38,7 @@ URL_RE = re.compile(r"https?://[^\s<>\"'`|]+")
 MENTION_RE = re.compile(r"(?<![\w.<])@([A-Za-z0-9][A-Za-z0-9._-]*)")
 # Slack's raw <@USERID> form; checked against author IDs instead of names.
 RAW_MENTION_RE = re.compile(r"<@([A-Z0-9]+)(?:\|[^>]*)?>")
-QUOTES = str.maketrans({"‘": "'", "’": "'", "“": '"', "”": '"'})
+QUOTES = str.maketrans({"\u2018": "'", "\u2019": "'", "\u201c": '"', "\u201d": '"'})
 
 
 @dataclass(frozen=True)
