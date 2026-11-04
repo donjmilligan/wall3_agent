@@ -1,0 +1,1 @@
+Sure! How about <day> at {{time}}? I'll send an invite.

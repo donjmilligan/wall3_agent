@@ -1,0 +1,1 @@
+Credentials don't get shared in Slack. If you need access to the ACME integration, raise an access request and it'll be reviewed there.
