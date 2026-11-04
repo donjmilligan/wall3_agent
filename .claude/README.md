@@ -23,7 +23,7 @@ repo. `CLAUDE.md` at the root is the working agreement; this is the machinery.
   list against that inventory), and the CLI write verbs (`bin/slack send`,
   `bin/clickup comment`, `bin/clickup status`), under `permissions.ask`, so each
   one prompts even if you allow-list broadly;
-- runs `outbound_guard.py` with `onFailure: "block"`, so a crash or timeout of
+- runs `.claude/hooks/outbound_guard.py` with `onFailure: "block"`, so a crash or timeout of
   the guard blocks the call instead of letting it through;
 - denies `rm -rf`, force pushes, `git reset --hard` and `--no-verify`; `Read` of
   `.env` / `.env.*` (not `.env.example`); and `curl`/`wget` straight to
