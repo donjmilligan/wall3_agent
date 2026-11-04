@@ -41,8 +41,8 @@ working tree, but CI will run against what is pushed. Prefer committing first.
 ### 2. Read the gates out of the CI workflows
 
 List the workflows: `ls "$R"/.github/workflows/`. (No `.github/workflows/`? Look
-for the repo's CI config: `.gitlab-ci.yml`, `.circleci/config.yml`, a
-`Makefile`/`justfile` target that CI calls, `tox.ini`/`noxfile.py`. If there is
+for the repo's CI config: `<repo>/.gitlab-ci.yml`, `<repo>/.circleci/config.yml`, a
+`Makefile`/`justfile` target that CI calls, `<repo>/tox.ini` or `<repo>/noxfile.py`. If there is
 no CI at all, say so: the gate becomes the commands named in the repo's
 `CLAUDE.md`, and the report says "no CI found; gate taken from CLAUDE.md".)
 
@@ -92,8 +92,8 @@ From the dump, for each workflow that runs on `pull_request` or `push`:
 ### 3. Map touched paths to packages
 
 A package is a directory CI runs gates in (a matrix entry or a job's
-`working-directory`), usually one with its own manifest (`pyproject.toml`,
-`package.json`, `go.mod`, `Cargo.toml`). Each changed path belongs to the
+`working-directory`), usually one with its own manifest (`<pkg>/pyproject.toml`,
+`<pkg>/package.json`, `<pkg>/go.mod`, `<pkg>/Cargo.toml`). Each changed path belongs to the
 **deepest** package directory that contains it. A change to the repo root's own
 files, to shared config (`pyproject.toml` at the root, the lockfile, the workflow
 files themselves), or to a package that others depend on, means running the gate

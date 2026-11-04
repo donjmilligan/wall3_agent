@@ -179,3 +179,25 @@ def test_source_filter_runs_only_that_source(fake_root):
     result = run(fake_root, "--source", "slack")
     assert result.returncode == 0, result.stderr
     assert "slack: 1 message(s) checked" in result.stdout
+
+
+@pytest.mark.parametrize("kind", ["task", "chat", "dm", "mpim"])
+def test_clickup_container_kinds_include_chat_dms(fake_root, kind):
+    # ClickUp chat has direct and group DMs; wall3_clickup labels them dm / mpim.
+    emit(fake_root, "slack", [slack_message()])
+    emit(fake_root, "clickup", [clickup_message(container={"kind": kind, "id": "c1", "name": "n"})])
+    result = run(fake_root)
+    assert result.returncode == 0, result.stderr
+    assert "clickup: 1 message(s) checked" in result.stdout
+
+
+def test_clickup_channel_kind_is_rejected(fake_root):
+    emit(fake_root, "slack", [slack_message()])
+    emit(
+        fake_root,
+        "clickup",
+        [clickup_message(container={"kind": "channel", "id": "c", "name": "n"})],
+    )
+    result = run(fake_root)
+    assert result.returncode == 1
+    assert "FAIL clickup line 1: container/kind" in result.stderr

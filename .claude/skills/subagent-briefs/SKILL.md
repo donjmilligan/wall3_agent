@@ -40,7 +40,7 @@ dispatch two agents, or one after the other.
 carry your assumptions, so do not paste them in as facts. Give it the
 evidence (paths, commands, quoted rulings) and let it read the code itself.
 "The bug is in `parse()`" is a conclusion; "the failing command is X and the
-traceback ends at `src/parse.py:88`" is evidence it can check.
+traceback ends at `<module>.py:88`" is evidence it can check.
 
 **Do not hand an agent your hypothesis to confirm.** An agent asked "confirm
 that X is the cause" tends to return X confirmed. Ask the open question ("find

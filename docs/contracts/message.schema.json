@@ -96,7 +96,7 @@
           "if": {"properties": {"source": {"const": "clickup"}}},
           "then": {
             "properties": {
-              "container": {"properties": {"kind": {"enum": ["task", "chat"]}}}
+              "container": {"properties": {"kind": {"enum": ["task", "chat", "dm", "mpim"]}}}
             }
           }
         }

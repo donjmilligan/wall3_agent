@@ -18,7 +18,7 @@ Arguments: `$ARGUMENTS` (optional `--since`; the default is since this session's
 3. **Stop and wait for Don.** Nothing has been sent or written.
 4. For each row Don approves, by number, one at a time:
    - **Slack or ClickUp reply:** follow `/reply` steps 5–7 (approve the exact text, write
-     it to the scratch `reply.txt`, run the send command with `--confirm`, report the
+     it to `$SCRATCH/reply.txt`, run the send command with `--confirm`, report the
      result). The outbound hook will ask Don again, which is expected.
    - **ClickUp comment or status change:** show the exact comment text and command, get
      Don's yes for that row, then run it. Comment before status, always.

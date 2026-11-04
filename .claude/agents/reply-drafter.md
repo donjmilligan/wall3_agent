@@ -73,7 +73,7 @@ has seen it.
    | ClickUp chat message | **No send verb exists in the contract.** Say so, and tell Don to paste the approved text by hand |
    | Top-level Slack DM (not threaded) | The contract's `send` always takes `--thread-ts`. Use the threaded form above and say so. Don't invent a flag |
 
-   `reply.txt` doesn't exist yet. The main session writes it from the text Don
+   `$SCRATCH/reply.txt` doesn't exist yet. The main session writes it from the text Don
    approves.
 6. **List proposed writes** other than the reply itself, such as a status change the
    thread asks for or a ClickUp comment recording an observation. Each one gets the

@@ -45,7 +45,7 @@ bin/clickup inbox --since 24h --json > "$SCRATCH/clickup.jsonl" 2> "$SCRATCH/cli
 
 Exit codes follow the shared contract: `0` ok, `1` config or API error.
 
-- On exit `1`: read the first line of the `.err` file and report it as
+- On exit `1`: read the first line of the `$SCRATCH/<source>.err` file and report it as
   **"Slack unreadable: <reason>"** (or ClickUp). Never print anything that looks like a
   token. Then continue with the source that worked.
 - If both fail, stop after the Findings section and say what Don needs to fix (for
@@ -72,7 +72,7 @@ bin/inbox-rank --json "$SCRATCH/slack.jsonl" "$SCRATCH/clickup.jsonl" > "$SCRATC
 For each row in NEEDS YOU, in rank order (the first 15 at most; list how many you
 skipped):
 
-- Read the row in `ranked.json`. If the snippet doesn't make the ask clear, read the
+- Read the row in `$SCRATCH/ranked.json`. If the snippet doesn't make the ask clear, read the
   thread with `bin/slack thread "<permalink>" --json` or
   `bin/clickup task <id> --comments --json`.
 - Write **what they want, in their terms, in one line**, ending with the permalink. For

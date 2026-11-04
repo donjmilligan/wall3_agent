@@ -26,7 +26,9 @@ line-length = 100
 target-version = "py312"
 # Each package runs its own gate from its own directory (see ci.yml); verified that
 # running ruff inside a package dir still lints it despite this exclusion.
-extend-exclude = ["clients", "tools/messaging"]
+# Markdown is excluded: code blocks in .claude/ docs are illustrative fragments
+# (an indented continuation, an elided `...`), not modules to reformat.
+extend-exclude = ["clients", "tools/messaging", "*.md"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]

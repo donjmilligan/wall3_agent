@@ -116,7 +116,7 @@ deleted?"** If the answer is "pass", it does not test the feature.
 ```python
 def test_token_not_logged(caplog):
     run_sync(config)
-    assert "sk-" not in caplog.text      # passes if run_sync() logged nothing at all
+    assert "sk-" not in caplog.text  # passes if run_sync() logged nothing at all
 ```
 
 Absence is also what breakage produces. If `run_sync` crashed before logging, or
@@ -124,8 +124,10 @@ logging is misconfigured in the test, this stays green. **Pair it with a
 positive assertion that proves the path ran:**
 
 ```python
-    assert "sync complete: 3 items" in caplog.text   # the path executed
-    assert "sk-" not in caplog.text                  # and did not leak
+def test_token_not_logged(caplog):
+    run_sync(config)
+    assert "sync complete: 3 items" in caplog.text  # the path executed
+    assert "sk-" not in caplog.text  # and did not leak
 ```
 
 Same for `assert calls == []`, `assert not errors`, `mock.assert_not_called()`,

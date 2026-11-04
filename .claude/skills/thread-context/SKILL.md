@@ -50,18 +50,21 @@ is public.
 ```bash
 # Slack: permalink or "<channel_id>:<ts>"
 bin/slack thread "<permalink|C:ts>" --json > "$SCRATCH/thread.jsonl"
-# ClickUp task comments
+# ClickUp task comments: the task object, plus its comments as Message JSONL
 bin/clickup task <task_id> --comments --json > "$SCRATCH/task-<task_id>.json"
+python3 -c 'import json,sys; [print(json.dumps(m)) for m in json.load(sys.stdin)["comments"]]' \
+  < "$SCRATCH/task-<task_id>.json" > "$SCRATCH/thread.jsonl"
 ```
 
 - Read every message in the thread, not only the newest. The real ask is often two
   messages up, and the newest may be a "+1".
 - Note **who is waiting** and since when (the `ts` of the first unanswered ask).
-- `thread.jsonl` must be Message JSONL (`docs/contracts/message.schema.json`), since it
-  is what `bin/check-draft --thread` reads. If a CLI's `--json` output for a ClickUp
-  task is a task object rather than Message lines, keep it as its own file and expect
-  check-draft to warn `unknown-url` on links that come from it. Verify those links by
-  hand and say so.
+- `$SCRATCH/thread.jsonl` must be Message JSONL (`docs/contracts/message.schema.json`), since it
+  is what `bin/check-draft --thread` reads. `bin/clickup task --comments --json` emits one
+  object, `{"task": {...}, "comments": [Message, ...]}`; the one-liner above turns its
+  `comments` into `$SCRATCH/thread.jsonl`. Links that appear only in the task
+  description are not in that file, so check-draft warns `unknown-url` on them:
+  verify those by hand and say so.
 - For a ClickUp **chat** message (`container.kind == "chat"`), read the channel with
   `bin/clickup chat messages <channel_id>`.
 
@@ -89,7 +92,7 @@ If the thread names a file, branch, PR or error message in this repo:
 
 ### 4. Don's prior replies
 
-- Don's earlier messages in the same thread are already in `thread.jsonl`. Read them.
+- Don's earlier messages in the same thread are already in `$SCRATCH/thread.jsonl`. Read them.
   Don't contradict what he said without pointing it out.
 - If the thread refers to an earlier conversation ("like I said last week"), one
   search is enough: `bin/slack search "<distinctive phrase>" --json`. Cite what you
