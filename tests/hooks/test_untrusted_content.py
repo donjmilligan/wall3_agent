@@ -55,6 +55,10 @@ CACHED_READ_COMMANDS = [
     "head -5 /tmp/wall3-reply.abc/task-abc123.json",
     "python3 -c 'import sys; print(sys.stdin.read())' < /tmp/s/thread.jsonl",
     "bin/inbox-rank < /tmp/inbox.jsonl",
+    # only the raw-text check sees this one: the path hides in a variable
+    "D=.cache/raw/slack; cat $D/x/whoami.json",
+    # only the printer rule sees this one: inbox-rank reading stdin from a pipe
+    "cat /tmp/s/inbox.txt | bin/inbox-rank --json",
     "bin/slack inbox --json | bin/inbox-rank",
 ]
 
